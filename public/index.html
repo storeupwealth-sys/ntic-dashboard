@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#0A0F1A" />
+<title>NTIC</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0A0F1A;--rail:#0D1220;--sidebar:#101828;--panel:#141E2E;--surface:#192436;--surface-2:#1C2A3D;--hover:#1E2C40;--card:#1A2538;--card-2:#152033;
+  --b0:rgba(255,255,255,0.05);--b1:rgba(255,255,255,0.09);--b2:rgba(255,255,255,0.15);
+  --g:#2DD4A0;--g1:rgba(45,212,160,0.10);--g2:rgba(45,212,160,0.05);--gg:0 0 24px rgba(45,212,160,0.16);
+  --a:#F5A623;--a1:rgba(245,166,35,0.10);--r:#E05555;--r1:rgba(224,85,85,0.10);
+  --bl:#4AADDE;--bl1:rgba(74,173,222,0.10);--p:#9B7EDE;--p1:rgba(155,126,222,0.10);
+  --gold:#D4AF5A;--gold1:rgba(212,175,90,0.10);--muted:#2A3A50;--sub:#506070;--text:#8AA8BF;--bright:#C8DCF0;--white:#E8F4FF;
+  --shadow:0 18px 50px rgba(0,0,0,0.25);--mono:'JetBrains Mono',monospace;--body:'Inter',sans-serif;--D:'Bebas Neue',sans-serif;
+  --rw:56px;--sw:260px;--rpw:300px;--radius:12px;
+}
+html,body{height:100%;overflow:hidden;background:linear-gradient(180deg,#08101c 0%,#0A0F1A 100%);color:var(--text);font-family:var(--body);font-size:13px}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:var(--muted);border-radius:8px}::-webkit-scrollbar-track{background:transparent}
+button,input{font:inherit}.hidden{display:none!important}
+
+@keyframes breathe{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.96)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes msgIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes voicePulse{0%,100%{box-shadow:0 0 0 0 rgba(45,212,160,0.35)}50%{box-shadow:0 0 0 12px rgba(45,212,160,0)}}
+@keyframes scan{from{transform:translateY(-100%)}to{transform:translateY(100vh)}}
+@keyframes glow{0%,100%{text-shadow:0 0 30px rgba(45,212,160,0.22)}50%{text-shadow:0 0 70px rgba(45,212,160,0.4)}}
+@keyframes speakWave{0%,100%{height:4px}50%{height:15px}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes nemotronPulse{0%,100%{box-shadow:0 0 0 0 rgba(155,126,222,0.4)}50%{box-shadow:0 0 8px 2px rgba(155,126,222,0.15)}}
+
+/* ── LOGIN ── */
+#login{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.lg-bg{position:absolute;inset:0}.lg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(45,212,160,0.024) 1px,transparent 1px),linear-gradient(90deg,rgba(45,212,160,0.024) 1px,transparent 1px);background-size:52px 52px}
+.lg-glow{position:absolute;width:840px;height:620px;border-radius:50%;background:radial-gradient(ellipse,rgba(45,212,160,0.06) 0%,transparent 72%);top:50%;left:50%;transform:translate(-50%,-55%);animation:breathe 6s ease-in-out infinite}
+.lg-scan{position:absolute;width:100%;height:2px;background:linear-gradient(transparent,rgba(45,212,160,0.05),transparent);animation:scan 10s linear infinite;pointer-events:none}
+.lg-box{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;max-width:440px;padding:48px 32px;animation:fadeUp .8s ease forwards}
+.lg-badge{display:flex;align-items:center;gap:6px;background:rgba(45,212,160,0.08);border:1px solid rgba(45,212,160,0.16);border-radius:999px;padding:5px 14px;font-size:10px;letter-spacing:3px;color:var(--g);margin-bottom:20px;text-transform:uppercase}
+.lg-dot{width:5px;height:5px;border-radius:50%;background:var(--g);animation:breathe 1.5s infinite}
+.lg-title{font-family:var(--D);font-size:96px;line-height:.9;letter-spacing:4px;color:var(--white);animation:glow 5s infinite}
+.lg-title em{color:var(--g);font-style:normal}
+.lg-tagline{font-size:11px;letter-spacing:4px;color:var(--sub);margin:12px 0 36px;text-transform:uppercase;text-align:center;line-height:1.7}
+.lg-field{width:100%;background:var(--panel);border:1px solid var(--b1);border-radius:var(--radius);padding:16px 20px;font-family:var(--mono);font-size:14px;letter-spacing:3px;color:var(--white);outline:none;transition:border-color .2s,box-shadow .2s}
+.lg-field:focus{border-color:var(--g);box-shadow:0 0 0 3px var(--g2)}
+.lg-field::placeholder{color:var(--muted);letter-spacing:1px;font-size:12px}
+.lg-btn{width:100%;padding:17px;background:var(--g);color:var(--bg);border:none;border-radius:var(--radius);font-family:var(--D);font-size:26px;letter-spacing:5px;cursor:pointer;transition:all .2s;overflow:hidden;margin-top:12px}
+.lg-btn:hover{box-shadow:var(--gg);transform:translateY(-1px)}.lg-btn:active{transform:scale(.98)}
+.lg-err{display:none;font-size:11px;color:var(--r);letter-spacing:1px;margin-top:10px;text-align:center}
+.lg-footer{margin-top:28px;display:flex;align-items:center;gap:8px;font-size:10px;letter-spacing:2px;color:var(--muted)}.lg-footer span{color:var(--g)}
+
+/* ── APP LAYOUT ── */
+#app{display:none;height:100dvh;position:relative}
+.desk{display:grid;grid-template:"rail sb top rp" 54px "rail sb main rp" 1fr / var(--rw) var(--sw) 1fr var(--rpw);height:100%}
+@media(max-width:1160px){.desk{grid-template:"rail sb top" 54px "rail sb main" 1fr / var(--rw) var(--sw) 1fr}.rp{display:none!important}}
+@media(max-width:760px){.desk{display:none!important}.mob{display:flex!important}}
+
+/* ── RAIL ── */
+.rail{grid-area:rail;background:rgba(13,18,32,.9);border-right:1px solid var(--b0);display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:6px;overflow-y:auto;backdrop-filter:blur(12px)}
+.ri{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;background:var(--panel);border:1px solid var(--b0);transition:all .2s;position:relative}
+.ri:hover{border-color:var(--b1);transform:scale(1.05)}
+.ri.on{background:var(--g1);border-color:rgba(45,212,160,.35)}
+.ri.on::before{content:'';position:absolute;left:-9px;width:3px;height:22px;border-radius:0 3px 3px 0;background:var(--g);box-shadow:var(--gg)}
+.ri-badge{position:absolute;top:-2px;right:-2px;background:var(--r);color:#fff;font-size:7px;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}
+.rdiv{width:28px;height:1px;background:var(--b0);margin:3px 0}
+
+/* ── SIDEBAR ── */
+.sb{grid-area:sb;background:rgba(16,24,40,.88);border-right:1px solid var(--b0);display:flex;flex-direction:column;overflow:hidden;backdrop-filter:blur(14px)}
+.sb-head{padding:12px 12px 10px;border-bottom:1px solid var(--b0);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.sb-logo{font-family:var(--D);font-size:20px;letter-spacing:3px;color:var(--white)}.sb-logo em{color:var(--g);font-style:normal}
+.sb-live{display:flex;align-items:center;gap:5px;font-size:9px;letter-spacing:1px;color:var(--g);font-family:var(--mono)}
+.ldot{width:6px;height:6px;border-radius:50%;background:var(--g);animation:breathe 1.8s infinite;box-shadow:0 0 6px var(--g)}
+
+/* Nemotron Status Bar */
+.sb-nemotron{padding:8px 12px;background:rgba(155,126,222,0.07);border-bottom:1px solid rgba(155,126,222,0.12);display:flex;align-items:center;gap:8px;flex-shrink:0;cursor:pointer;transition:background .2s}
+.sb-nemotron:hover{background:rgba(155,126,222,0.12)}
+.nem-dot{width:7px;height:7px;border-radius:50%;background:var(--p);animation:nemotronPulse 2s infinite;flex-shrink:0}
+.nem-text{flex:1}
+.nem-label{font-size:9px;color:var(--p);letter-spacing:1.5px;font-family:var(--mono);font-weight:600}
+.nem-model{font-size:9px;color:var(--muted);margin-top:1px;font-family:var(--mono)}
+.nem-badge{font-size:8px;background:rgba(155,126,222,0.2);color:var(--p);padding:2px 7px;border-radius:10px;border:1px solid rgba(155,126,222,0.25);font-family:var(--mono);white-space:nowrap}
+
+/* Empire Quick Stats */
+.sb-empire{padding:8px 12px;border-bottom:1px solid var(--b0);display:flex;gap:0;flex-shrink:0}
+.emp-stat{flex:1;display:flex;flex-direction:column;align-items:center;padding:4px 2px;border-right:1px solid var(--b0)}
+.emp-stat:last-child{border-right:none}
+.emp-val{font-family:var(--D);font-size:16px;letter-spacing:1px;line-height:1}
+.emp-lbl{font-size:8px;color:var(--muted);letter-spacing:1px;margin-top:2px;text-transform:uppercase;font-family:var(--mono)}
+
+.sb-scroll{flex:1;overflow-y:auto;padding-bottom:4px}
+
+/* Section headers */
+.cat{padding:10px 10px 4px;font-size:9px;letter-spacing:2px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none;text-transform:uppercase;font-family:var(--mono);font-weight:500;transition:color .2s}
+.cat:hover{color:var(--sub)}.cat-arr{transition:transform .2s;font-size:8px}.cat-arr.c{transform:rotate(-90deg)}
+.cat-body{overflow:hidden}
+
+/* Channel rows */
+.ch{display:flex;align-items:center;gap:7px;padding:6px 10px 6px 16px;margin:1px 4px;border-radius:10px;cursor:pointer;color:var(--sub);font-size:12px;transition:all .15s}
+.ch:hover{background:var(--surface);color:var(--text)}.ch.on{background:rgba(45,212,160,0.08);color:var(--bright)}.ch.on .chi{color:var(--g)}
+.chi{font-size:13px;color:var(--muted);width:16px;text-align:center;flex-shrink:0}
+.ch-badge{margin-left:auto;background:var(--r);color:#fff;font-size:8px;padding:2px 6px;border-radius:10px;font-weight:600}
+.ch-dot{margin-left:auto;width:6px;height:6px;border-radius:50%;background:var(--g);animation:breathe 2.5s infinite}
+.ch-sub{margin-left:auto;font-size:8px;color:var(--muted);font-family:var(--mono)}
+
+/* Agent row in sidebar - enhanced */
+.ch-agent{display:flex;align-items:center;gap:7px;padding:5px 10px 5px 10px;margin:1px 4px;border-radius:10px;cursor:pointer;color:var(--sub);font-size:12px;transition:all .15s}
+.ch-agent:hover{background:var(--surface);color:var(--text)}
+.ch-agent.on{background:rgba(45,212,160,0.08);color:var(--bright)}
+.agent-em{font-size:14px;width:20px;text-align:center;flex-shrink:0}
+.agent-info{flex:1;min-width:0}
+.agent-name-row{display:flex;align-items:center;gap:6px}
+.agent-nm{font-size:12px;font-weight:500}
+.agent-model-tag{font-size:8px;color:var(--muted);font-family:var(--mono);background:var(--surface);padding:1px 5px;border-radius:4px;white-space:nowrap}
+.agent-model-tag.nemotron{color:var(--p);background:rgba(155,126,222,0.1);border:1px solid rgba(155,126,222,0.2)}
+.agent-status-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-left:auto}
+.agent-status-dot.online{background:var(--g);animation:pulse 2s infinite}
+.agent-status-dot.thinking{background:var(--a);animation:pulse 0.8s infinite}
+.agent-status-dot.standby{background:var(--muted)}
+
+/* System Links */
+.sb-links{padding:8px 12px;display:flex;flex-direction:column;gap:4px;border-top:1px solid var(--b0);flex-shrink:0}
+.sb-link{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;cursor:pointer;transition:background .15s;font-size:11px;color:var(--sub);text-decoration:none}
+.sb-link:hover{background:var(--surface);color:var(--text)}
+.sb-link-icon{font-size:13px;width:18px;text-align:center;flex-shrink:0}
+.sb-link-label{flex:1}
+.sb-link-status{font-size:8px;padding:2px 6px;border-radius:6px;font-family:var(--mono)}
+.sb-link-status.ok{background:rgba(45,212,160,0.12);color:var(--g)}
+.sb-link-status.warn{background:rgba(245,166,35,0.12);color:var(--a)}
+
+/* System Health Bar */
+.sb-health{padding:8px 12px;background:rgba(13,18,32,.6);border-top:1px solid var(--b0);flex-shrink:0}
+.health-label{font-size:8px;letter-spacing:2px;color:var(--muted);font-family:var(--mono);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.health-label span{color:var(--g)}
+.health-bars{display:flex;flex-direction:column;gap:4px}
+.health-row{display:flex;align-items:center;gap:8px}
+.health-name{font-size:9px;color:var(--muted);width:48px;font-family:var(--mono);flex-shrink:0}
+.health-bar{flex:1;height:3px;background:var(--muted);border-radius:999px;overflow:hidden}
+.health-fill{height:100%;border-radius:999px;transition:width 1s}
+.health-pct{font-size:8px;color:var(--sub);font-family:var(--mono);width:28px;text-align:right;flex-shrink:0}
+
+/* WS Status */
+.sb-ws{display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(13,18,32,.8);border-top:1px solid var(--b0);flex-shrink:0;font-size:9px;font-family:var(--mono)}
+.ws-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.ws-dot.connected{background:var(--g);animation:pulse 2s infinite}
+.ws-dot.disconnected{background:var(--muted)}
+.ws-dot.connecting{background:var(--a);animation:pulse 0.6s infinite}
+.ws-label{flex:1;color:var(--muted)}
+.ws-url{color:var(--sub);font-size:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px}
+
+/* James Profile */
+.sb-profile{padding:10px 12px;border-top:1px solid var(--b0);display:flex;align-items:center;gap:9px;flex-shrink:0;cursor:pointer;transition:background .15s}
+.sb-profile:hover{background:var(--surface)}
+.profile-av{width:32px;height:32px;border-radius:9px;background:rgba(45,212,160,0.15);border:1px solid rgba(45,212,160,0.3);display:flex;align-items:center;justify-content:center;font-family:var(--D);font-size:13px;color:var(--g);flex-shrink:0}
+.profile-info{flex:1;min-width:0}
+.profile-name{font-size:12px;font-weight:600;color:var(--white);}
+.profile-role{font-size:9px;color:var(--muted);font-family:var(--mono);letter-spacing:1px}
+.profile-badge{font-size:8px;background:var(--gold1);color:var(--gold);padding:2px 7px;border-radius:8px;border:1px solid rgba(212,175,90,.2);font-family:var(--mono);white-space:nowrap}
+
+/* ── TOP BAR ── */
+.top{grid-area:top;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:rgba(16,24,40,.88);border-bottom:1px solid var(--b0);backdrop-filter:blur(14px)}
+.top-l{display:flex;align-items:center;gap:8px}.top-ch{font-size:14px;color:var(--white);font-weight:600}.top-sep{color:var(--muted)}.top-desc{font-size:11px;color:var(--muted)}
+.top-r{display:flex;align-items:center;gap:14px}
+.tstat{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--sub);font-family:var(--mono)}
+.tv{color:var(--g);font-weight:600}.tv.a{color:var(--a)}.tv.b{color:var(--bl)}
+.top-clock{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.top-notif{position:relative;width:34px;height:34px;background:var(--surface);border:1px solid var(--b1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:all .2s}
+.top-notif:hover{border-color:var(--b2)}.tnb{position:absolute;top:-3px;right:-3px;background:var(--r);color:#fff;font-size:8px;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}
+
+/* ── MAIN ── */
+.main{grid-area:main;display:flex;flex-direction:column;background:linear-gradient(180deg,#0a1320 0%,#0A0F1A 100%);overflow:hidden}
+.ticker-bar{display:flex;align-items:center;background:rgba(45,212,160,0.025);border-bottom:1px solid rgba(45,212,160,0.07);height:30px;overflow:hidden;flex-shrink:0}
+.ticker-lbl{padding:0 14px;height:100%;display:flex;align-items:center;font-size:9px;letter-spacing:2px;color:var(--g);background:var(--g1);border-right:1px solid rgba(45,212,160,0.12);white-space:nowrap;flex-shrink:0;font-family:var(--mono)}
+.ticker-track{flex:1;overflow:hidden}.ticker-inner{display:flex;animation:ticker 45s linear infinite;white-space:nowrap}
+.t-item{padding:0 20px;font-size:10px;color:var(--sub);height:30px;display:flex;align-items:center;gap:6px;white-space:nowrap;border-right:1px solid var(--b0);font-family:var(--mono)}
+.tup{color:var(--g)}.tdn{color:var(--r)}
+.mc-bar{display:flex;align-items:center;overflow-x:auto;flex-shrink:0;background:rgba(20,30,46,.8);border-bottom:1px solid var(--b0);backdrop-filter:blur(8px)}
+.mci{display:flex;flex-direction:column;padding:10px 18px;border-right:1px solid var(--b0);flex-shrink:0;min-width:96px}
+.mci-v{font-family:var(--D);font-size:20px;letter-spacing:1px;line-height:1.1}.mci-l{font-size:9px;letter-spacing:1px;color:var(--muted);margin-top:2px;text-transform:uppercase}
+.msgs{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:2px}
+.mg{display:flex;gap:12px;padding:5px 0;margin-bottom:4px;animation:msgIn .3s ease forwards}.mg.me{flex-direction:row-reverse}
+.av{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--panel);border:1px solid var(--b0);margin-top:2px}
+.mw{flex:1;max-width:80%}.mg.me .mw{display:flex;flex-direction:column;align-items:flex-end}.mh{display:flex;align-items:baseline;gap:8px;margin-bottom:5px}.mg.me .mh{flex-direction:row-reverse}
+.mn{font-size:12px;font-weight:600;letter-spacing:.5px}.mt{font-size:10px;color:var(--muted);font-family:var(--mono)}
+.mb{background:rgba(20,30,46,.85);border:1px solid var(--b0);border-radius:14px 14px 14px 4px;padding:12px 15px;font-size:13px;line-height:1.65;color:var(--text);box-shadow:var(--shadow)}
+.mg.me .mb{background:rgba(45,212,160,0.07);border-color:rgba(45,212,160,0.15);border-radius:14px 14px 4px 14px;color:var(--bright)}
+.mb .hi{color:var(--g);font-weight:600}.mb .wa{color:var(--a)}.mb .bl{color:var(--bl)}.mb .go{color:var(--gold)}
+.mb code{background:rgba(45,212,160,0.08);color:var(--g);padding:1px 7px;border-radius:5px;font-size:12px;font-family:var(--mono)}
+.sys-msg{background:rgba(74,173,222,0.07);border:1px solid rgba(74,173,222,0.12);border-radius:10px;padding:9px 15px;font-size:12px;color:var(--bl);margin:5px 0;text-align:center}
+.alert-strip,.gold-strip{border-left:3px solid;border-radius:0 10px 10px 0;padding:10px 15px;font-size:12px;margin:4px 0;line-height:1.6;color:var(--text)}
+.alert-strip{background:var(--a1);border-left-color:var(--a)}.alert-strip b{color:var(--a)}
+.gold-strip{background:var(--gold1);border-left-color:var(--gold)}.gold-strip b{color:var(--gold)}
+.divline{display:flex;align-items:center;gap:10px;margin:10px 0;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;font-family:var(--mono)}
+.divline::before,.divline::after{content:'';flex:1;height:1px;background:var(--b0)}
+
+.voice-btn{width:40px;height:40px;border-radius:50%;background:var(--surface);border:1.5px solid var(--b1);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;flex-shrink:0}
+.voice-btn:hover{border-color:var(--g);transform:scale(1.05)}
+.voice-btn.listening{background:var(--g1);border-color:var(--g);animation:voicePulse 1s ease-in-out infinite}
+.voice-waves{display:none;align-items:center;gap:2px;height:16px}.voice-btn.listening .voice-waves{display:flex}.voice-btn.listening .voice-emoji{display:none}
+.wave-bar{width:3px;border-radius:2px;background:var(--g);animation:speakWave .5s ease-in-out infinite}.wave-bar:nth-child(2){animation-delay:.1s}.wave-bar:nth-child(3){animation-delay:.2s}.wave-bar:nth-child(4){animation-delay:.1s}
+.inp-area{padding:12px 20px;background:rgba(16,24,40,.9);border-top:1px solid var(--b0);flex-shrink:0;backdrop-filter:blur(14px)}
+.inp-box{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--b1);border-radius:14px;padding:10px 14px;transition:all .2s}
+.inp-box:focus-within{border-color:rgba(45,212,160,0.4);box-shadow:0 0 0 3px var(--g2)}
+.inp-at{color:var(--g);font-weight:700;font-size:15px;font-family:var(--mono);flex-shrink:0}
+.inp{flex:1;background:transparent;border:none;outline:none;color:var(--white);font-family:var(--body);font-size:13px}
+.inp::placeholder{color:var(--muted)}
+.inp-send{background:var(--g);color:var(--bg);border:none;padding:8px 18px;border-radius:10px;font-family:var(--D);font-size:17px;letter-spacing:2px;cursor:pointer;transition:all .2s;flex-shrink:0}
+.inp-send:hover{box-shadow:var(--gg)}.inp-send:active{transform:scale(.97)}
+.voice-status{font-size:10px;color:var(--g);letter-spacing:1px;padding:4px 10px;font-family:var(--mono);display:none;text-align:center}.voice-status.show{display:block}
+.chips-row{padding:8px 20px;display:flex;gap:7px;overflow-x:auto;background:rgba(16,24,40,.82);flex-shrink:0;border-top:1px solid rgba(255,255,255,0.02)}
+.chip{flex-shrink:0;padding:7px 14px;background:var(--surface);border:1px solid var(--b0);border-radius:999px;font-size:11px;color:var(--text);cursor:pointer;white-space:nowrap;transition:all .2s}
+.chip:hover{background:var(--g1);border-color:rgba(45,212,160,.2);color:var(--g)}
+
+/* ── RIGHT PANEL ── */
+.rp{grid-area:rp;background:rgba(16,24,40,.9);border-left:1px solid var(--b0);display:flex;flex-direction:column;overflow:hidden;backdrop-filter:blur(14px)}
+.rp-tabs{display:flex;border-bottom:1px solid var(--b0);flex-shrink:0}
+.rpt{flex:1;padding:10px 2px;text-align:center;font-size:9px;letter-spacing:1px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;text-transform:uppercase;font-family:var(--mono)}
+.rpt.on{color:var(--g);border-bottom-color:var(--g)}
+.rp-body{flex:1;overflow-y:auto;padding:12px}.rp-sec{display:none}.rp-sec.on{display:block}
+.acard,.thinker,.snap,.mc-tile{background:rgba(26,37,56,.85);border:1px solid var(--b0);border-radius:12px;box-shadow:var(--shadow)}
+.acard{padding:12px;margin-bottom:8px;cursor:pointer;transition:all .2s}.acard:hover{background:var(--surface);border-color:var(--b1)}
+.acard.ac{border-left:3px solid var(--g)}.acard.bz{border-left:3px solid var(--a)}.acard.id{border-left:3px solid var(--muted)}
+.act{display:flex;align-items:center;gap:9px;margin-bottom:7px}.acem{font-size:20px}.acn{font-size:12px;font-weight:600;color:var(--white)}.acr{font-size:10px;color:var(--muted);margin-top:1px}
+.acs{display:flex;align-items:center;gap:5px;font-size:10px;margin-top:3px}.sd{width:6px;height:6px;border-radius:50%}
+.actask{font-size:11px;color:var(--sub);line-height:1.5;margin-bottom:6px}.acbar{height:4px;background:var(--muted);border-radius:999px;overflow:hidden}.acfill{height:100%;border-radius:999px;transition:width 1.5s}.acmeta{display:flex;justify-content:space-between;margin-top:5px;font-size:9px;color:var(--muted);font-family:var(--mono)}
+.intel{padding:10px 0;border-bottom:1px solid var(--b0)}.intel:last-child{border:none}
+.itag{display:inline-block;font-size:8px;letter-spacing:1px;padding:3px 9px;border-radius:999px;margin-bottom:5px;font-weight:600;text-transform:uppercase;font-family:var(--mono)}
+.itag.opp{background:var(--g1);color:var(--g);border:1px solid rgba(45,212,160,.18)}.itag.lead{background:var(--a1);color:var(--a);border:1px solid rgba(245,166,35,.18)}.itag.sig{background:var(--bl1);color:var(--bl);border:1px solid rgba(74,173,222,.18)}.itag.risk{background:var(--r1);color:var(--r);border:1px solid rgba(224,85,85,.18)}.itag.pred{background:var(--p1);color:var(--p);border:1px solid rgba(155,126,222,.18)}.itag.gold{background:var(--gold1);color:var(--gold);border:1px solid rgba(212,175,90,.18)}
+.intel-t{font-size:12px;color:var(--text);line-height:1.55}.intel-m{font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)}
+.mc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.mc-tile{padding:12px;text-align:center}.mc-val{font-family:var(--D);font-size:28px;letter-spacing:1px}.mc-lbl{font-size:9px;letter-spacing:1px;color:var(--muted);margin-top:2px;text-transform:uppercase}
+.wf-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--b0);font-size:12px}.wf-row:last-child{border:none}.wf-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}.wf-name{flex:1;color:var(--text)}.wf-st{font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:5px;font-family:var(--mono)}.run{background:var(--g1);color:var(--g)}.done{background:rgba(80,96,112,.15);color:var(--muted)}.queue{background:var(--a1);color:var(--a)}
+.snap{padding:10px;margin-bottom:7px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .2s}.snap:hover{background:var(--surface)}.snap-icon{font-size:18px}.snap-info{flex:1}.snap-name{font-size:12px;color:var(--white);font-weight:600}.snap-meta{font-size:10px;color:var(--muted);margin-top:2px;font-family:var(--mono)}.snap-ok{font-size:9px;padding:3px 8px;border-radius:5px;background:var(--g1);color:var(--g);font-family:var(--mono)}.snap-restore{font-size:9px;letter-spacing:1px;padding:5px 11px;background:var(--surface);border:1px solid var(--b1);border-radius:6px;color:var(--text);cursor:pointer;transition:all .2s;font-family:var(--mono)}.snap-restore:hover{border-color:var(--g);color:var(--g)}
+.thinker{padding:12px;margin-bottom:8px}.tth{display:flex;align-items:center;gap:9px;margin-bottom:7px}.ttem{font-size:20px}.ttn{font-size:12px;font-weight:600;color:var(--gold)}.ttl{font-size:10px;color:var(--muted);margin-top:1px}.tti{font-size:12px;color:var(--text);line-height:1.6}
+.sec-lbl{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--b0);font-family:var(--mono)}
+
+/* ── MOBILE ── */
+.mob{display:none;flex-direction:column;height:100dvh;background:var(--bg)}
+.mob-top,.mob-feed-head,.mob-intel-head,.mob-ap,.mob-ch-search{background:rgba(16,24,40,.9);backdrop-filter:blur(14px)}
+.mob-top{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;border-bottom:1px solid var(--b0);flex-shrink:0}
+.mob-logo{font-family:var(--D);font-size:24px;letter-spacing:4px;color:var(--white)}.mob-logo em{color:var(--g);font-style:normal}.mob-r{display:flex;align-items:center;gap:10px}.mob-live{display:flex;align-items:center;gap:5px;font-size:9px;letter-spacing:1px;color:var(--g);font-family:var(--mono)}
+.mob-notif{position:relative;width:32px;height:32px;background:var(--surface);border:1px solid var(--b1);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer}.mob-nb{position:absolute;top:-3px;right:-3px;background:var(--r);color:#fff;font-size:8px;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}.mob-clock{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.mob-ticker{display:flex;align-items:center;background:rgba(45,212,160,.02);border-bottom:1px solid rgba(45,212,160,.07);height:26px;overflow:hidden;flex-shrink:0}.mob-tlbl{padding:0 12px;font-size:8px;letter-spacing:2px;color:var(--g);background:var(--g1);border-right:1px solid rgba(45,212,160,.12);height:100%;display:flex;align-items:center;white-space:nowrap;flex-shrink:0;font-family:var(--mono)}.mob-track{flex:1;overflow:hidden}.mob-tinner{display:flex;animation:ticker 35s linear infinite;white-space:nowrap}.mob-ti{padding:0 16px;font-size:9px;color:var(--sub);height:26px;display:flex;align-items:center;gap:5px;white-space:nowrap;border-right:1px solid var(--b0);font-family:var(--mono)}
+.mob-nav{display:flex;background:rgba(16,24,40,.9);border-bottom:1px solid var(--b0);flex-shrink:0;backdrop-filter:blur(14px)}
+.mnt{flex:1;padding:9px 2px 7px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);transition:all .2s;position:relative}.mnt.on{color:var(--g);border-bottom-color:var(--g)}.mnt-icon{font-size:18px}.mnt-lbl{font-size:8px;letter-spacing:1px;text-transform:uppercase;font-family:var(--mono)}.mnt-badge{position:absolute;top:6px;right:calc(50% - 16px);background:var(--r);color:#fff;font-size:7px;width:13px;height:13px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}
+.mob-screen{display:none;flex:1;overflow:hidden;flex-direction:column}.mob-screen.on{display:flex}
+.mob-mc{display:flex;overflow-x:auto;flex-shrink:0;padding:10px 14px;gap:16px;background:rgba(20,30,46,.82);border-bottom:1px solid var(--b0)}.mob-mci{display:flex;flex-direction:column;align-items:center;flex-shrink:0;min-width:72px}.mob-mci-v{font-family:var(--D);font-size:22px;letter-spacing:1px;line-height:1}.mob-mci-l{font-size:8px;letter-spacing:1px;color:var(--muted);margin-top:3px;text-transform:uppercase;text-align:center}
+.mob-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.mob-chips{padding:8px 14px;display:flex;gap:7px;overflow-x:auto;flex-shrink:0;border-top:1px solid var(--b0);background:rgba(16,24,40,.9)}
+.mob-inp-area{padding:10px 14px;background:rgba(16,24,40,.9);border-top:1px solid var(--b0);flex-shrink:0}.mob-inp-box{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--b1);border-radius:14px;padding:11px 14px;transition:all .2s}.mob-inp-box:focus-within{border-color:rgba(45,212,160,.4)}.mob-at{color:var(--g);font-weight:700;font-size:15px;font-family:var(--mono)}.mob-field{flex:1;background:transparent;border:none;outline:none;color:var(--white);font-size:14px}.mob-field::placeholder{color:var(--muted)}.mob-send{background:var(--g);color:var(--bg);border:none;width:34px;height:34px;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}.mob-send:active{opacity:.75;transform:scale(.92)}.mob-vstatus{font-size:10px;color:var(--g);letter-spacing:1px;padding:4px 10px;font-family:var(--mono);display:none;text-align:center}.mob-vstatus.show{display:block}
+.mob-agent-row{display:flex;gap:8px;overflow-x:auto;padding:12px 14px 10px;flex-shrink:0;border-bottom:1px solid var(--b0);background:rgba(16,24,40,.9)}.map{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;cursor:pointer;padding:9px 12px;border-radius:12px;border:1px solid var(--b0);background:var(--surface);transition:all .2s;min-width:68px}.map.on{background:var(--g1);border-color:rgba(45,212,160,.25)}.map-em{font-size:24px}.map-name{font-size:9px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;font-family:var(--mono)}.map.on .map-name{color:var(--g)}
+.mob-ap{padding:14px 16px;border-bottom:1px solid var(--b0);flex-shrink:0}.mapr{display:flex;align-items:center;gap:13px}.mapr-em{font-size:40px}.mapr-info{flex:1}.mapr-name{font-family:var(--D);font-size:30px;letter-spacing:3px;color:var(--white)}.mapr-role{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:2px}.mapr-status{display:flex;align-items:center;gap:5px;font-size:10px;margin-top:5px;font-family:var(--mono)}.mapr-task{font-size:12px;color:var(--sub);margin-top:7px;line-height:1.6}.mapr-bar{height:3px;background:var(--muted);border-radius:999px;margin-top:10px;overflow:hidden}.mapr-fill{height:100%;border-radius:999px}.mapr-stats{display:flex;gap:22px;margin-top:10px}.msv{font-family:var(--D);font-size:24px;letter-spacing:1px}.msl{font-size:8px;letter-spacing:1px;color:var(--muted);font-family:var(--mono)}.mob-agent-chat{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.mob-feed-head,.mob-intel-head{padding:12px 16px 10px;border-bottom:1px solid var(--b0);flex-shrink:0}.mob-feed-title,.mob-intel-title{font-family:var(--D);font-size:26px;letter-spacing:3px;color:var(--white)}.mob-feed-sub,.mob-intel-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.mob-filters{display:flex;gap:6px;overflow-x:auto;margin-top:10px}.flt{padding:4px 13px;border-radius:20px;flex-shrink:0;font-size:10px;letter-spacing:1px;border:1px solid var(--b0);color:var(--muted);cursor:pointer;transition:all .2s;font-family:var(--mono)}.flt.on{font-weight:600}.mob-feed-list,.mob-intel-body{flex:1;overflow-y:auto;padding:14px 16px}
+.fcard{background:rgba(26,37,56,.88);border:1px solid var(--b0);border-radius:14px;padding:15px;margin-bottom:10px;position:relative;overflow:hidden;cursor:pointer;transition:all .2s;animation:fadeUp .3s ease}.fcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}.fcard.lead::before{background:var(--a)}.fcard.approval::before{background:var(--g)}.fcard.pred::before{background:var(--p)}.fcard.alert::before{background:var(--r)}.fcard.intel-c::before{background:var(--bl)}.fcard.gold-c::before{background:var(--gold)}.fcard:active{transform:scale(.98)}.fc-top{display:flex;align-items:center;gap:7px;margin-bottom:8px}.ftag{font-size:8px;letter-spacing:1px;padding:3px 9px;border-radius:12px;font-weight:600;text-transform:uppercase;font-family:var(--mono)}.fc-agent{font-size:10px;color:var(--muted);margin-left:auto;font-family:var(--mono)}.fc-title{font-size:14px;color:var(--white);font-weight:600;margin-bottom:5px;line-height:1.4}.fc-body{font-size:12px;color:var(--sub);line-height:1.6}.fc-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:10px}.fc-time{font-size:9px;color:var(--muted);font-family:var(--mono)}.fc-score{font-family:var(--D);font-size:28px;letter-spacing:1px;margin-left:auto}.fc-btn{font-size:10px;letter-spacing:1px;padding:7px 14px;border-radius:8px;border:none;cursor:pointer;font-family:var(--mono);font-weight:600;transition:all .2s}.fc-btn.p{background:var(--g);color:var(--bg)}.fc-btn.s{background:var(--surface);color:var(--muted);border:1px solid var(--b0)}.fc-btn-gap{display:flex;gap:8px}
+.mob-ch-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column}.mob-ch-search{padding:10px 14px;border-bottom:1px solid var(--b0);flex-shrink:0}.mob-ch-box{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--b0);border-radius:9px;padding:9px 13px}.mob-ch-inp{flex:1;background:transparent;border:none;outline:none;color:var(--white);font-size:13px}.mob-ch-inp::placeholder{color:var(--muted)}.mob-ch-list{flex:1;overflow-y:auto}.mob-cat{padding:10px 14px 4px;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-family:var(--mono)}.mob-chr{display:flex;align-items:center;gap:9px;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,.02);cursor:pointer;transition:background .15s}.mob-chr:active{background:var(--surface)}.mob-chr.on{background:rgba(45,212,160,.04)}.mob-chi{font-size:14px;color:var(--muted);width:18px;text-align:center;flex-shrink:0}.mob-chr.on .mob-chi{color:var(--g)}.mob-chn{flex:1;font-size:13px;color:var(--text)}.mob-chr.on .mob-chn{color:var(--white)}.mob-chb{background:var(--r);color:#fff;font-size:8px;padding:2px 6px;border-radius:8px;font-weight:600}.mob-chd{width:6px;height:6px;border-radius:50%;background:var(--g);animation:breathe 2.5s infinite}
+.notif-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;opacity:0;pointer-events:none;transition:opacity .25s}.notif-ov.on{opacity:1;pointer-events:all}.notif-dr{position:fixed;top:0;right:-100%;width:min(390px,100%);height:100%;background:var(--bg);border-left:1px solid var(--b0);z-index:301;display:flex;flex-direction:column;transition:right .3s cubic-bezier(.4,0,.2,1)}.notif-dr.on{right:0}.nd-head{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid var(--b0);background:rgba(16,24,40,.95);flex-shrink:0}.nd-title{font-family:var(--D);font-size:24px;letter-spacing:3px;color:var(--white)}.nd-close{width:34px;height:34px;border-radius:9px;background:var(--surface);border:1px solid var(--b0);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .2s}.nd-close:hover{border-color:var(--b2)}.nd-list{flex:1;overflow-y:auto;padding:12px 14px}.nd-item{background:rgba(20,30,46,.9);border:1px solid var(--b0);border-radius:12px;padding:13px;margin-bottom:8px;display:flex;gap:10px;cursor:pointer;transition:all .2s}.nd-item.unread{border-color:rgba(45,212,160,.18);background:rgba(45,212,160,.03)}.nd-em{font-size:22px;flex-shrink:0}.nd-cnt{flex:1}.nd-type{font-size:8px;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;font-family:var(--mono)}.nd-text{font-size:12px;color:var(--text);line-height:1.55}.nd-time{font-size:10px;color:var(--muted);margin-top:4px;font-family:var(--mono)}.nd-dot{width:7px;height:7px;border-radius:50%;background:var(--g);flex-shrink:0;margin-top:5px}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="lg-bg"><div class="lg-grid"></div><div class="lg-glow"></div><div class="lg-scan"></div></div>
+  <div class="lg-box">
+    <div class="lg-badge"><span class="lg-dot"></span>Private Access</div>
+    <div class="lg-title">NT<em>IC</em></div>
+    <div class="lg-tagline">Nexus Throne Intelligence Capital<br>Sovereign AI Operating System</div>
+    <input class="lg-field" id="lg-pass" type="password" placeholder="Enter access code..." onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="lg-btn" onclick="doLogin()">ENTER</button>
+    <div class="lg-err" id="lg-err">⚠ Access denied</div>
+    <div class="lg-footer">🔒 <span>Private</span> · Authorized access only · NTIC2026</div>
+  </div>
+</div>
+
+<div class="notif-ov" id="nov" onclick="closeNotifs()"></div>
+<div class="notif-dr" id="ndr">
+  <div class="nd-head"><div class="nd-title">ALERTS</div><div class="nd-close" onclick="closeNotifs()">✕</div></div>
+  <div class="nd-list" id="alert-list"></div>
+</div>
+
+<div id="app">
+  <div class="desk">
+
+    <!-- RAIL -->
+    <div class="rail">
+      <div class="ri on" onclick="selRail(this)" title="Command">⚔️</div>
+      <div class="ri" onclick="selRail(this)" title="Intelligence" style="position:relative">📡<div class="ri-badge">3</div></div>
+      <div class="ri" onclick="selRail(this)" title="Leads">🎯</div>
+      <div class="ri" onclick="selRail(this)" title="Pipeline">💰</div>
+      <div class="rdiv"></div>
+      <div class="ri" onclick="selRail(this)" title="ORACLE / Nemotron">🔮</div>
+      <div class="ri" onclick="selRail(this)" title="Global Grid">🌍</div>
+      <div class="ri" onclick="selRail(this)" title="Content">⚡</div>
+      <div class="rdiv"></div>
+      <div class="ri" onclick="selRail(this)" title="Think Tank">🏆</div>
+      <div class="ri" onclick="selRail(this)" title="Vault">🗄️</div>
+      <div class="ri" onclick="selRail(this)" title="Snapshots">💾</div>
+      <div class="rdiv"></div>
+      <div class="ri" onclick="window.open('https://ntic-gateway-production-6e07.up.railway.app/health','_blank')" title="Railway">🚂</div>
+      <div class="ri" onclick="window.open('https://github.com/storeupwealth-sys/ntic-gateway','_blank')" title="GitHub">⚙️</div>
+      <div class="rdiv"></div>
+      <div class="ri" onclick="selRail(this)" title="Settings" style="margin-top:auto">⚙️</div>
+    </div>
+
+    <!-- SIDEBAR — fully upgraded -->
+    <div class="sb">
+      <!-- Header -->
+      <div class="sb-head">
+        <div class="sb-logo">NT<em>IC</em></div>
+        <div class="sb-live"><span class="ldot"></span><span id="online-count">9 ONLINE</span></div>
+      </div>
+
+      <!-- Nemotron Status -->
+      <div class="sb-nemotron" onclick="window.open('https://ntic-gateway-production-6e07.up.railway.app/health','_blank')">
+        <div class="nem-dot"></div>
+        <div class="nem-text">
+          <div class="nem-label">⚡ ORACLE × NEMOTRON</div>
+          <div class="nem-model">nemotron-3-super-120b-a12b · 1M ctx</div>
+        </div>
+        <div class="nem-badge">LIVE</div>
+      </div>
+
+      <!-- Empire Quick Stats -->
+      <div class="sb-empire">
+        <div class="emp-stat"><div class="emp-val" style="color:var(--g)">$127K</div><div class="emp-lbl">Pipeline</div></div>
+        <div class="emp-stat"><div class="emp-val" style="color:var(--a)">31%</div><div class="emp-lbl">Reply Rate</div></div>
+        <div class="emp-stat"><div class="emp-val" style="color:var(--p)">94%</div><div class="emp-lbl">Confidence</div></div>
+        <div class="emp-stat"><div class="emp-val" style="color:var(--gold)">47</div><div class="emp-lbl">Experiments</div></div>
+      </div>
+
+      <!-- Scrollable nav -->
+      <div class="sb-scroll">
+
+        <!-- AGENTS — all 9 with model tags -->
+        <div class="cat" onclick="toggleCat(this)"><span class="cat-arr">▾</span>Agents — 9 Active</div>
+        <div class="cat-body">
+          <div class="ch-agent on" onclick="selCh(this,'👑 halo-direct','Direct channel · HALO Field Commander · Claude Opus 4.6')">
+            <div class="agent-em">👑</div>
+            <div class="agent-info">
+              <div class="agent-name-row"><span class="agent-nm">HALO</span><span class="agent-model-tag">Opus 4.6</span></div>
+            </div>
+            <div class="agent-status-dot online"></div>
+          </div>
+          <div class="ch-agent" onclick="selCh(this,'🔮 oracle-direct','Direct channel · ORACLE Strategy Engine · Nemotron 3 Super')">
+            <div class="agent-em">🔮</div>
+            <div class="agent-info">
+              <div class="agent-name-row"><span class="agent-nm">ORACLE</span><span class="agent-model-tag nemotron">Nemotron</span></div>
+            </div>
+            <div class="agent-status-dot thinking"></div>
+          </div>
+          <div class="ch-agent" onclick="selCh(this,'👻 wraith-direct','Direct channel · WRAITH Recon & Lead Extraction · Gemini Flash')">
+            <div class="agent-em">👻</div>
+            <div class="agent-info">
+              <div class="agent-name-row"><span class="agent-nm">WRAITH</span><span class="agent-model-tag">Gemini Flash</span></div>
+            </div>
+            <div class="agent-status-dot online"></div>
+          </div>
+          <div class="ch-agent" onclick="selCh(this,'👁️ vision-direct','Direct channel · VISION System Watch · Gemini Flash')">
+            <div class="agent-em">👁️</div>
+            <div class="agent-info">
+              <div class="agent-name-row"><span class="agent-nm">VISION</span><span class="agent-model-tag">Gemini Flash</span></div>
+            </div>
+            <div class="agent-status-dot online"></div>
+          </div>
+          <div class="ch-agent" onclick="selCh(this,'⚡ prophet-direct','Direct channel · PROPHET Content Intel · Claude Sonnet 4.6')">
+            <div class="agent-em">⚡</div>
+            <div class="agent-info">
+              <div class="agent-name-row"><span class="agent-nm">PROPHET</span><span class="agent-model-tag">Sonnet 4.6</span></div>
+            </div>
+            <div class="agent-status-dot online"></div>
+          </div>
+          <div class="ch-agent" onclick="selCh(this,'⚖️ legis-direct','Direct channel · LEGIS Compliance · Claude Haiku 4.5')">
+            <div class="agent-em">⚖️</div>
+            <div class="agent-info">
+              <div class="agent-name-row"><span class="agent-nm">LEGIS</span><span class="agent-model-tag">Haiku 4.5</span></div>
+            </div>
+            <div class="agent-status-dot standby"></div>
+          </div>
+          <div class="ch-agent" onclick="selCh(this,'🧠 nexus-direct','Direct channel · NEXUS War-Room Brain · Claude Opus 4.6')">
+            <div class="agent-em">🧠</div>
+            <div class="agent-info">
+              <div class="agent-name-row"><span class="agent-nm">NEXUS</span><span class="agent-model-tag">Opus 4.6</span></div>
+            </div>
+            <div class="agent-status-dot online"></div>
+          </div>
+          <div class="ch-agent" onclick="selCh(this,'🤝 guardian-direct','Direct channel · GUARDIAN Client Interface · Claude Sonnet 4.6')">
+            <div class="agent-em">🤝</div>
+            <div class="agent-info">
+              <div class="agent-name-row"><span class="agent-nm">GUARDIAN</span><span class="agent-model-tag">Sonnet 4.6</span></div>
+            </div>
+            <div class="agent-status-dot standby"></div>
+          </div>
+          <div class="ch-agent" onclick="selCh(this,'💰 treasury-direct','Direct channel · TREASURY Revenue Tracking · Claude Haiku 4.5')">
+            <div class="agent-em">💰</div>
+            <div class="agent-info">
+              <div class="agent-name-row"><span class="agent-nm">TREASURY</span><span class="agent-model-tag">Haiku 4.5</span></div>
+            </div>
+            <div class="agent-status-dot online"></div>
+          </div>
+        </div>
+
+        <!-- COMMAND -->
+        <div class="cat" onclick="toggleCat(this)"><span class="cat-arr">▾</span>Command</div>
+        <div class="cat-body">
+          <div class="ch" onclick="selCh(this,'# war-room','War room · high priority actions')"><span class="chi">#</span>war-room<span class="ch-badge">5</span></div>
+          <div class="ch" onclick="selCh(this,'# nexus','Nexus synthesis stream')"><span class="chi">#</span>nexus<span class="ch-dot"></span></div>
+          <div class="ch" onclick="selCh(this,'# mission-control','Mission control overview')"><span class="chi">#</span>mission-control</div>
+          <div class="ch" onclick="selCh(this,'# halo-approvals','Pending approvals queue')"><span class="chi">#</span>halo-approvals<span class="ch-badge">3</span></div>
+        </div>
+
+        <!-- INTELLIGENCE -->
+        <div class="cat" onclick="toggleCat(this)"><span class="cat-arr">▾</span>Intelligence</div>
+        <div class="cat-body">
+          <div class="ch" onclick="selCh(this,'# intel-briefings','Current intelligence briefings')"><span class="chi">#</span>intel-briefings<span class="ch-badge">2</span></div>
+          <div class="ch" onclick="selCh(this,'# prediction-radar','Prediction radar feed')"><span class="chi">#</span>prediction-radar<span class="ch-dot"></span></div>
+          <div class="ch" onclick="selCh(this,'# capital-flows','Capital flow stream')"><span class="chi">#</span>capital-flows<span class="ch-dot"></span></div>
+          <div class="ch" onclick="selCh(this,'# global-grid','Global expansion signals')"><span class="chi">#</span>global-grid<span class="ch-dot"></span></div>
+          <div class="ch" onclick="selCh(this,'# oracle-reasoning','ORACLE Nemotron reasoning chain stream')"><span class="chi">⚡</span>oracle-reasoning<span class="ch-dot" style="background:var(--p)"></span></div>
+        </div>
+
+        <!-- THINK TANK -->
+        <div class="cat" onclick="toggleCat(this)"><span class="cat-arr">▾</span>Think Tank</div>
+        <div class="cat-body">
+          <div class="ch" onclick="selCh(this,'🏆 1pct-thinking','1% Pioneer thinking · Jensen, Satoshi, Rothschild')"><span class="chi">🏆</span>1pct-thinking</div>
+          <div class="ch" onclick="selCh(this,'🎯 pioneer-council','Pioneer council briefings')"><span class="chi">🎯</span>pioneer-council</div>
+          <div class="ch" onclick="selCh(this,'🗄️ ip-vault','IP vault · protected doctrine')"><span class="chi">🗄️</span>ip-vault</div>
+          <div class="ch" onclick="selCh(this,'🌍 global-philanthropy','Global market + philanthropy signals')"><span class="chi">🌍</span>global-philanthropy<span class="ch-dot"></span></div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="cat" onclick="toggleCat(this)"><span class="cat-arr">▾</span>Content</div>
+        <div class="cat-body">
+          <div class="ch" onclick="selCh(this,'# viral-signals','Viral signal feed · PROPHET')"><span class="chi">#</span>viral-signals<span class="ch-dot"></span></div>
+          <div class="ch" onclick="selCh(this,'# clip-factory','Clip factory queue · 6 ready')"><span class="chi">🎬</span>clip-factory<span class="ch-sub">6 ready</span></div>
+          <div class="ch" onclick="selCh(this,'# prophet-content','PROPHET content output stream')"><span class="chi">#</span>prophet-content</div>
+          <div class="ch" onclick="selCh(this,'# linkedin-ops','LinkedIn outreach operations')"><span class="chi">#</span>linkedin-ops</div>
+        </div>
+
+        <!-- OPERATIONS -->
+        <div class="cat" onclick="toggleCat(this)"><span class="cat-arr">▾</span>Operations</div>
+        <div class="cat-body">
+          <div class="ch" onclick="selCh(this,'# snapshots','System snapshots · revert control')"><span class="chi">💾</span>snapshots<span class="ch-sub">✓ 06:00</span></div>
+          <div class="ch" onclick="selCh(this,'# task-queue','Active task queue · all agents')"><span class="chi">#</span>task-queue<span class="ch-badge" style="background:var(--a)">12</span></div>
+          <div class="ch" onclick="selCh(this,'# system-alerts','System alerts · VISION')"><span class="chi">⚠️</span>system-alerts</div>
+          <div class="ch" onclick="selCh(this,'# autoresearch','Autoresearch loop · overnight experiments')"><span class="chi">🔬</span>autoresearch<span class="ch-sub">47 exp</span></div>
+          <div class="ch" onclick="selCh(this,'# apify-feeds','Apify actor feeds · WRAITH data')"><span class="chi">#</span>apify-feeds<span class="ch-dot"></span></div>
+        </div>
+
+        <!-- PIPELINE -->
+        <div class="cat" onclick="toggleCat(this)"><span class="cat-arr">▾</span>Pipeline</div>
+        <div class="cat-body">
+          <div class="ch" onclick="selCh(this,'# leads-hot','Hot leads · score 80+')"><span class="chi">🔥</span>leads-hot<span class="ch-badge" style="background:var(--r)">8</span></div>
+          <div class="ch" onclick="selCh(this,'# outreach-active','Active outreach sequences')"><span class="chi">#</span>outreach-active<span class="ch-dot"></span></div>
+          <div class="ch" onclick="selCh(this,'# treasury-reports','Revenue reports · TREASURY')"><span class="chi">💰</span>treasury-reports<span class="ch-dot"></span></div>
+          <div class="ch" onclick="selCh(this,'# client-success','Active client success · GUARDIAN')"><span class="chi">🤝</span>client-success</div>
+        </div>
+
+      </div><!-- /sb-scroll -->
+
+      <!-- System Links -->
+      <div class="sb-links">
+        <a class="sb-link" href="https://ntic-gateway-production-6e07.up.railway.app" target="_blank">
+          <span class="sb-link-icon">🚂</span>
+          <span class="sb-link-label">Railway Gateway</span>
+          <span class="sb-link-status ok" id="railway-status">LIVE</span>
+        </a>
+        <a class="sb-link" href="https://github.com/storeupwealth-sys/ntic-gateway" target="_blank">
+          <span class="sb-link-icon">⚙️</span>
+          <span class="sb-link-label">GitHub Repo</span>
+          <span class="sb-link-status ok">SYNC</span>
+        </a>
+        <a class="sb-link" href="https://nexusthrone.com" target="_blank">
+          <span class="sb-link-icon">🌐</span>
+          <span class="sb-link-label">nexusthrone.com</span>
+          <span class="sb-link-status ok">UP</span>
+        </a>
+      </div>
+
+      <!-- System Health -->
+      <div class="sb-health">
+        <div class="health-label">SYSTEM HEALTH <span id="health-score">ALL GREEN</span></div>
+        <div class="health-bars">
+          <div class="health-row"><span class="health-name">Railway</span><div class="health-bar"><div class="health-fill" style="width:99.97%;background:var(--g)"></div></div><span class="health-pct">99.97%</span></div>
+          <div class="health-row"><span class="health-name">Agents</span><div class="health-bar"><div class="health-fill" style="width:100%;background:var(--g)"></div></div><span class="health-pct">9/9</span></div>
+          <div class="health-row"><span class="health-name">ORACLE</span><div class="health-bar"><div class="health-fill" style="width:88%;background:var(--p)"></div></div><span class="health-pct">88%</span></div>
+          <div class="health-row"><span class="health-name">APIs</span><div class="health-bar"><div class="health-fill" style="width:100%;background:var(--g)"></div></div><span class="health-pct">4/4</span></div>
+        </div>
+      </div>
+
+      <!-- WebSocket Status -->
+      <div class="sb-ws">
+        <div class="ws-dot disconnected" id="ws-dot"></div>
+        <span class="ws-label" id="ws-label">OFFLINE</span>
+        <span class="ws-url" id="ws-url">ntic-gateway-production-6e07...</span>
+      </div>
+
+      <!-- James Brown Profile -->
+      <div class="sb-profile">
+        <div class="profile-av">JB</div>
+        <div class="profile-info">
+          <div class="profile-name">James Brown</div>
+          <div class="profile-role">FOUNDER · ZJK CAPITAL</div>
+        </div>
+        <div class="profile-badge">SOVEREIGN</div>
+      </div>
+
+    </div><!-- /sidebar -->
+
+    <!-- TOP BAR -->
+    <div class="top">
+      <div class="top-l">
+        <div class="top-ch" id="top-ch">👑 halo-direct</div>
+        <div class="top-sep">·</div>
+        <div class="top-desc" id="top-desc">Direct channel · HALO Field Commander · Claude Opus 4.6</div>
+      </div>
+      <div class="top-r">
+        <div class="tstat">LEADS <span class="tv" id="metric-leads">34</span></div>
+        <div class="tstat">PIPE <span class="tv a" id="metric-pipe">$127K</span></div>
+        <div class="tstat">UPTIME <span class="tv b" id="metric-uptime">99.97%</span></div>
+        <div class="top-notif" onclick="openNotifs()">🔔<div class="tnb">4</div></div>
+        <div class="top-clock" id="desk-clk">--:--</div>
+      </div>
+    </div>
+
+    <!-- MAIN CHAT -->
+    <div class="main">
+      <div class="ticker-bar">
+        <div class="ticker-lbl">⚡ LIVE</div>
+        <div class="ticker-track"><div class="ticker-inner" id="desk-ticker"></div></div>
+      </div>
+      <div class="mc-bar" id="metric-cards"></div>
+      <div class="msgs" id="desk-msgs"></div>
+      <div class="voice-status" id="desk-vstatus">🎤 Listening...</div>
+      <div class="chips-row" id="desk-chips"></div>
+      <div class="inp-area">
+        <div class="inp-box">
+          <span class="inp-at">@</span>
+          <input class="inp" id="desk-inp" placeholder="Command your agents — type or speak..." onkeydown="if(event.key==='Enter')sendDesk()">
+          <button class="voice-btn" id="desk-vbtn" onclick="toggleVoice('desk')" title="Tap to speak">
+            <span class="voice-emoji">🎤</span>
+            <div class="voice-waves"><div class="wave-bar" style="height:8px"></div><div class="wave-bar" style="height:14px"></div><div class="wave-bar" style="height:6px"></div><div class="wave-bar" style="height:12px"></div></div>
+          </button>
+          <button class="inp-send" onclick="sendDesk()">SEND</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="rp">
+      <div class="rp-tabs">
+        <div class="rpt on" onclick="switchRp('agents',this)">Agents</div>
+        <div class="rpt" onclick="switchRp('intel',this)">Intel</div>
+        <div class="rpt" onclick="switchRp('ctrl',this)">Control</div>
+        <div class="rpt" onclick="switchRp('think',this)">Think</div>
+      </div>
+      <div class="rp-body">
+        <div class="rp-sec on" id="rp-agents"></div>
+        <div class="rp-sec" id="rp-intel"></div>
+        <div class="rp-sec" id="rp-ctrl"></div>
+        <div class="rp-sec" id="rp-think"></div>
+      </div>
+    </div>
+
+  </div><!-- /desk -->
+
+  <!-- MOBILE -->
+  <div class="mob">
+    <div class="mob-top">
+      <div class="mob-logo">NT<em>IC</em></div>
+      <div class="mob-r">
+        <div class="mob-live"><span class="ldot"></span>9 LIVE</div>
+        <div class="mob-notif" onclick="openNotifs()">🔔<div class="mob-nb">4</div></div>
+        <div class="mob-clock" id="mob-clk">--:--</div>
+      </div>
+    </div>
+    <div class="mob-ticker"><div class="mob-tlbl">⚡ LIVE</div><div class="mob-track"><div class="mob-tinner" id="mob-ticker"></div></div></div>
+    <div class="mob-nav">
+      <div class="mnt on" onclick="mobTab('cmd',this)"><div class="mnt-icon">⚔️</div><div class="mnt-lbl">Command</div></div>
+      <div class="mnt" onclick="mobTab('agents',this)"><div class="mnt-icon">🤖</div><div class="mnt-lbl">Agents</div></div>
+      <div class="mnt" onclick="mobTab('feed',this)"><div class="mnt-icon">📡</div><div class="mnt-lbl">Feed</div><div class="mnt-badge">4</div></div>
+      <div class="mnt" onclick="mobTab('intel',this)"><div class="mnt-icon">🔮</div><div class="mnt-lbl">Intel</div></div>
+      <div class="mnt" onclick="mobTab('channels',this)"><div class="mnt-icon">☰</div><div class="mnt-lbl">Channels</div></div>
+    </div>
+
+    <div class="mob-screen on" id="mob-cmd">
+      <div class="mob-mc" id="mob-metrics"></div>
+      <div class="mob-msgs" id="mob-msgs"></div>
+      <div class="mob-chips" id="mob-chips"></div>
+      <div class="mob-vstatus" id="mob-vstatus">🎤 Listening...</div>
+      <div class="mob-inp-area">
+        <div class="mob-inp-box">
+          <span class="mob-at">@</span>
+          <input class="mob-field" id="mob-inp" placeholder="Type or tap mic..." onkeydown="if(event.key==='Enter')sendMob()">
+          <button class="voice-btn" id="mob-vbtn" onclick="toggleVoice('mob')" title="Tap to speak">
+            <span class="voice-emoji">🎤</span>
+            <div class="voice-waves"><div class="wave-bar" style="height:8px"></div><div class="wave-bar" style="height:14px"></div><div class="wave-bar" style="height:6px"></div><div class="wave-bar" style="height:12px"></div></div>
+          </button>
+          <button class="mob-send" onclick="sendMob()">↑</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mob-screen" id="mob-agents">
+      <div class="mob-agent-row" id="mob-agent-row"></div>
+      <div class="mob-ap" id="mob-ap"></div>
+      <div class="mob-agent-chat" id="mob-ac"></div>
+      <div class="mob-inp-area">
+        <div class="mob-inp-box">
+          <span class="mob-at">@</span>
+          <input class="mob-field" id="mob-ainp" placeholder="Direct message..." onkeydown="if(event.key==='Enter')sendAgent()">
+          <button class="voice-btn" id="mob-avbtn" onclick="toggleVoice('mob-a')" style="width:34px;height:34px"><span class="voice-emoji" style="font-size:15px">🎤</span><div class="voice-waves"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div></button>
+          <button class="mob-send" onclick="sendAgent()">↑</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mob-screen" id="mob-feed">
+      <div class="mob-feed-head">
+        <div class="mob-feed-title">Smart Feed</div>
+        <div class="mob-feed-sub">Auto-prioritized · What matters now</div>
+        <div class="mob-filters">
+          <div class="flt on" style="border-color:var(--g);color:var(--g)" onclick="fltFeed('all',this)">All</div>
+          <div class="flt" onclick="fltFeed('lead',this)">Leads</div>
+          <div class="flt" onclick="fltFeed('approval',this)">Approvals</div>
+          <div class="flt" onclick="fltFeed('pred',this)">Predictions</div>
+          <div class="flt" onclick="fltFeed('intel-c',this)">Intel</div>
+        </div>
+      </div>
+      <div class="mob-feed-list" id="mob-feed-list"></div>
+    </div>
+
+    <div class="mob-screen" id="mob-intel">
+      <div class="mob-intel-head">
+        <div class="mob-intel-title">Intelligence</div>
+        <div class="mob-intel-sub">Predictions · Signals · Snapshots · Think Tank</div>
+      </div>
+      <div class="mob-intel-body" id="mob-intel-body"></div>
+    </div>
+
+    <div class="mob-screen" id="mob-channels">
+      <div class="mob-ch-wrap">
+        <div class="mob-ch-search"><div class="mob-ch-box"><span style="color:var(--muted)">🔍</span><input class="mob-ch-inp" placeholder="Search channels..." oninput="searchChs(this.value)"></div></div>
+        <div class="mob-ch-list" id="mob-ch-list"></div>
+      </div>
+    </div>
+  </div><!-- /mob -->
+</div><!-- /app -->
+
+<script>
+const store={
+  metrics:[
+    {value:'34',label:'Leads Today',color:'var(--g)'},{value:'$127K',label:'Pipeline',color:'var(--a)'},
+    {value:'9/9',label:'Agents Live',color:'var(--g)'},{value:'91',label:'Top Score',color:'var(--p)'},
+    {value:'12',label:'Signals',color:'var(--bl)'},{value:'94%',label:'Confidence',color:'var(--g)'},
+    {value:'5',label:'Approvals',color:'var(--a)'},{value:'47',label:'Experiments',color:'var(--gold)'}
+  ],
+  ticker:[
+    'F/G INDEX <span class="tup">64 — GREED</span>','HVAC DEMAND <span class="tup">+31% WoW</span>',
+    'NEMOTRON <span class="tup">ORACLE LIVE</span>','PIPELINE <span class="tup">$127,400</span>',
+    'TOP SCORE <span class="tup">91/100</span>','ORACLE CONF. <span class="tup">94%</span>',
+    'AI SERVICES <span class="tup">+23%</span>','LEADS SCORED <span class="tup">34</span>',
+    'AUTORESEARCH <span class="tup">+11% GAIN</span>','REPLY RATE <span class="tup">31% CHAMPION</span>',
+    'CAPITAL FLOWS <span class="tup">AI INFRA ↑</span>','GLOBAL SIGNALS <span class="tup">12 ACTIVE</span>',
+    'SNAPSHOTS <span class="tup">AUTO ✓</span>','NEXUS <span class="tup">REMEMBERS</span>'
+  ],
+  alerts:[
+    {icon:'🎯',type:'NEW LEAD',color:'var(--a)',text:'Apex Roofing, Atlanta — Score 91/100. Decision maker identified. Ready for outreach.',time:'2 min ago · WRAITH',unread:true},
+    {icon:'✅',type:'APPROVAL NEEDED',color:'var(--g)',text:'HALO requesting authorization: HVAC Atlanta sequence. 14 targets. Est. $19,200.',time:'7 min ago · HALO',unread:true},
+    {icon:'⚡',type:'ORACLE REASONING',color:'var(--p)',text:'Nemotron 3 Super — 8,192 token reasoning chain complete. HVAC market signal confirmed 94%.',time:'10 min ago · ORACLE',unread:true},
+    {icon:'📡',type:'PREDICTION',color:'var(--p)',text:'AI home services demand +31% WoW. 90-day first-mover window open.',time:'18 min ago · ORACLE',unread:true},
+    {icon:'💰',type:'PIPELINE UPDATE',color:'var(--gold)',text:'Pipeline value: $127,400. 3 deals moved to HOT status.',time:'34 min ago · TREASURY',unread:false},
+    {icon:'💾',type:'SNAPSHOT',color:'var(--bl)',text:'Auto-snapshot saved at 06:00. System at peak state. Revert available.',time:'3 hr ago · VISION',unread:false}
+  ],
+  deskMessages:[
+    {type:'divider',text:'Today · NTIC Command · All Systems Green · ORACLE on Nemotron 3 Super'},
+    {type:'system',text:'🟢 NTIC Command online. 9 agents connected. ORACLE running on Nemotron 3 Super (120B/12B active, 1M context). James Brown — you own this platform.'},
+    {name:'HALO',emoji:'👑',color:'var(--g)',time:'09:00',text:'Good morning James. All systems nominal. <span class="hi">34 leads scored overnight.</span><br><br>Top pick: <span class="hi">Apex Roofing, Atlanta — score 91.</span> WRAITH has the decision maker\'s direct line. ORACLE confirmed HVAC is highest-ROI — demand up 31% this week.<br><br><span class="wa">5 approvals pending.</span> Authorize the HVAC sequence → projected $19,200 in 14 days. Your move.'},
+    {type:'alert',kind:'alert-strip',text:'<b>⚡ PROPHET</b> — 6 viral clips queued. AI automation niche 3.2× above engagement baseline. Virality score: <b>91/100.</b> K-factor model: exponential reach within 72 hours.'},
+    {name:'ORACLE',emoji:'🔮',color:'var(--p)',time:'09:02',text:'<span class="hi">Nemotron 3 Super reasoning complete — 8,192 tokens.</span> 13 tools executed across 4 rounds.<br><br>Fear & Greed: <span class="hi">64 — Greed territory.</span> Optimal outreach window. AI automation demand <span class="hi">+23% WoW.</span> WRAITH data confirms spring ramp incoming — 45% more HVAC calls in 3 weeks.<br><br><span class="go">Pioneer signal:</span> 6–12 month head start window open right now. No AI competitor in your target markets yet.'},
+    {type:'alert',kind:'gold-strip',text:'<b>🏆 THINK TANK — 1% SIGNAL</b> — Jensen Huang: "Build the platform others build on top of." Your NTIC Industry Packs = your NIM layer. SMBs are your enterprise market. <b>Nobody is serving them. This is the moat.</b>'},
+    {name:'VISION',emoji:'👁️',color:'var(--bl)',time:'09:05',text:'System health: <span class="hi">all green.</span><br><code>Railway</code> ✓ &nbsp;<code>NVIDIA API</code> ✓ &nbsp;<code>Anthropic</code> ✓ &nbsp;<code>Apify</code> ✓ &nbsp;<code>Discord</code> ✓<br><br><span class="hi">Auto-snapshot saved at 06:00 — clean state confirmed.</span> Uptime: 99.97%. ORACLE on Nemotron: <span class="hi">response time 4.2s avg.</span>'},
+    {name:'NEXUS',emoji:'🧠',color:'var(--g)',time:'09:08',text:'<span class="hi">Cross-agent synthesis complete.</span> 4 agents confirm HVAC Eastern NC at 94% confidence.<br><br>TREASURY tracking $127,400 pipeline. TREASURY reporting 47 autoresearch experiments — champion variant locked at 31% reply rate, +11% overnight gain.<br><br><span class="go">NEXUS remembers what ChatGPT forgets.</span> <span class="hi">Authorize the HVAC sequence → $19,200 projected in 14 days.</span>'}
+  ],
+  chips:['Morning brief','Show top leads','What needs approval','Pipeline update','Prediction signals','Authorize HVAC sequence','1% thinking brief','Empire status'],
+  agents:[
+    {id:'halo',em:'👑',name:'HALO',role:'Field Commander',status:'ACTIVE',statusColor:'var(--g)',task:'Orchestrating HVAC Atlanta. 5 approvals pending James.',fill:'92%',fillColor:'var(--g)',model:'claude-opus-4-6',s1:'92%',s2:'5',s3:'34',intro:'James — direct channel open. 34 leads ready. 5 approvals waiting. HVAC Atlanta sequence armed. Say the word.'},
+    {id:'oracle',em:'🔮',name:'ORACLE',role:'Strategy & Prediction',status:'REASONING',statusColor:'var(--p)',task:'Nemotron 3 Super — 8,192 token reasoning complete. HVAC confidence 94%.',fill:'88%',fillColor:'var(--p)',model:'nemotron-3-super',s1:'88%',s2:'94%',s3:'13',intro:'James — Nemotron 3 Super online. 1M context, reasoning enabled, 13 tools wired. HVAC window is open. Authorize.'},
+    {id:'wraith',em:'👻',name:'WRAITH',role:'Recon & Lead Extraction',status:'HUNTING',statusColor:'var(--g)',task:'34 leads scored. Apex Roofing decision maker confirmed. Google Maps + Apollo wired.',fill:'85%',fillColor:'var(--g)',model:'gemini-flash',s1:'85%',s2:'34',s3:'91',intro:'James — 34 leads scored overnight. Top: Apex Roofing, score 91. CEO confirmed. Direct line secured. Ready to initiate.'},
+    {id:'prophet',em:'⚡',name:'PROPHET',role:'Media & Viral Intel',status:'CREATING',statusColor:'var(--g)',task:'6 clips ready. K-factor 91/100. LinkedIn hooks scored. Exponential reach in 72hrs.',fill:'71%',fillColor:'var(--p)',model:'claude-sonnet-4-6',s1:'71%',s2:'6',s3:'91',intro:'James — 6 clips queued. Virality 91/100. Exponential reach in 72 hours. Ready on your signal.'},
+    {id:'vision',em:'👁️',name:'VISION',role:'Systems & Snapshots',status:'MONITORING',statusColor:'var(--g)',task:'All green. Railway 99.97%. NVIDIA API live. Snapshot 06:00 clean.',fill:'40%',fillColor:'var(--bl)',model:'gemini-flash',s1:'99.97%',s2:'✓',s3:'0',intro:'James — all green. Railway, NVIDIA, Anthropic, Apify, Discord all healthy. Snapshot clean. One-click revert ready.'},
+    {id:'legis',em:'⚖️',name:'LEGIS',role:'Legal & Compliance',status:'STANDBY',statusColor:'var(--muted)',task:'All compliance passed. HVAC outreach cleared NC/SC. IP vault secured.',fill:'20%',fillColor:'var(--muted)',model:'claude-haiku-4-5',s1:'100%',s2:'✓',s3:'0',intro:'James — compliance cleared. Cold email legal in NC and SC. Unsubscribe footer required. IP secured.'},
+    {id:'nexus',em:'🧠',name:'NEXUS',role:'War-Room Brain',status:'SYNTHESIZING',statusColor:'var(--g)',task:'Cross-agent synthesis done. Memory updated. Pipeline $127K. Confidence 94%.',fill:'88%',fillColor:'var(--g)',model:'claude-opus-4-6',s1:'88%',s2:'94%',s3:'127K',intro:'James — NEXUS remembers what ChatGPT forgets. Synthesis complete. 94% confidence. Authorize and we close the first client.'},
+    {id:'guardian',em:'🤝',name:'GUARDIAN',role:'Client Interface',status:'STANDBY',statusColor:'var(--muted)',task:'Client interface ready. First client onboarding protocol armed.',fill:'15%',fillColor:'var(--muted)',model:'claude-sonnet-4-6',s1:'100%',s2:'0',s3:'0',intro:'James — standing by. Client onboarding ready. The moment you close the first HVAC client, I handle their experience.'},
+    {id:'treasury',em:'💰',name:'TREASURY',role:'Revenue Tracking',status:'TRACKING',statusColor:'var(--gold)',task:'Pipeline $127,400. MTD $18,400. 47 experiments. Forecast running.',fill:'55%',fillColor:'var(--gold)',model:'claude-haiku-4-5',s1:'$127K',s2:'$4.2K',s3:'3',intro:'James — pipeline $127,400. MRR $4,200. 3 active clients. 90-day forecast: $67,000. Path to $1M: 17 months at current trajectory.'}
+  ],
+  intel:[
+    {tag:'NEMOTRON',cls:'pred',text:'ORACLE × Nemotron 3 Super: 8,192 token reasoning complete. 13 tools executed. HVAC confidence 94%.',meta:'ORACLE · just now'},
+    {tag:'PREDICTION',cls:'pred',text:'AI home services +31% WoW. 90-day first-mover window. Institutional capital entering.',meta:'ORACLE · 2 min ago'},
+    {tag:'HOT LEAD',cls:'lead',text:'Apex Roofing Atlanta — score 91. CEO direct line confirmed by WRAITH.',meta:'WRAITH · 4 min ago'},
+    {tag:'1% SIGNAL',cls:'gold',text:'Institutional money entering AI infra. Same pattern as SaaS 2010. 6-12mo head start available.',meta:'ORACLE · 11 min ago'},
+    {tag:'GLOBAL',cls:'sig',text:'Lagos, Nairobi, São Paulo — same HVAC problem, zero AI penetration. First-mover open.',meta:'NEXUS · 18 min ago'},
+    {tag:'BEHAVIORAL',cls:'pred',text:'Decision makers 3.4× more likely to engage Tue/Wed 9–11am. Window: NOW.',meta:'ORACLE · 22 min ago'},
+    {tag:'AUTORESEARCH',cls:'opp',text:'47 experiments overnight. Champion EXP-047: 31% reply rate, pain-first 3-line opener. +11% gain.',meta:'ORACLE · 2hr ago'},
+    {tag:'REGULATORY',cls:'risk',text:'FTC draft AI outreach rules. 90-day comment period. Current methods compliant.',meta:'LEGIS · 2hr ago'}
+  ],
+  workflows:[
+    ['HVAC Atlanta Sequence','run','var(--g)'],['Lead Scoring Engine','run','var(--g)'],
+    ['Nemotron Reasoning Loop','run','var(--p)'],['Prediction Radar','run','var(--g)'],
+    ['Global Grid Monitor','run','var(--g)'],['Viral Clip Factory','queue','var(--a)'],
+    ['Auto-Snapshot (6hr)','run','var(--g)'],['Autoresearch Loop (2am)','run','var(--g)'],
+    ['Capital Flow Watch','done','var(--muted)']
+  ],
+  snapshots:[
+    ['Today 06:00 — Peak','9 agents · 34 leads · $127K · Nemotron live · all green'],
+    ['Yesterday 06:00','7 agents · 29 leads · all green']
+  ],
+  thinkers:[
+    ['🔲','JENSEN HUANG','Build the platform others build on','Your Industry Packs = NIM microservices for SMBs. Every business that buys your HVAC or Roofing pack is building on your infrastructure. You become the NVIDIA of small business AI.'],
+    ['🎲','SATOSHI PRINCIPLE','Permissionless. Self-sovereign.','NTIC runs on Railway. You own the server. ORACLE runs on Nemotron — your key, your model, your data. No platform can ban you. This is what sovereign intelligence means.'],
+    ['💎','ROTHSCHILD TIMING','Move when others are afraid','Fear/Greed at 64. Market is greedy but SMBs are still afraid of AI. That fear gap is your entry window. When they stop being afraid, the window closes.'],
+    ['🌍','GLOBAL FIRST MOVER','Go where nobody has gone','Lagos, Nairobi, São Paulo: same SMB problems, zero AI competition. NEXUS scales instantly to these markets. Philanthropy and profit aligned.']
+  ],
+  feed:[
+    {type:'approval',title:'Authorize HVAC Atlanta Sequence',body:'14 targets. Decision makers confirmed. ORACLE Nemotron 94% confidence. Projected $19,200 in 14 days.',score:'',agent:'HALO · 2min',tag:'Approval',tagStyle:'background:var(--g1);color:var(--g);border:1px solid rgba(45,212,160,.2)'},
+    {type:'lead',title:'Apex Roofing — Atlanta, GA',body:'CEO confirmed. Direct line secured. Pain: manual follow-up, 15hrs/week. Score 91.',score:'91',agent:'WRAITH · 4min',tag:'Hot Lead',tagStyle:'background:var(--a1);color:var(--a);border:1px solid rgba(245,166,35,.2)'},
+    {type:'pred',title:'AI Home Services — 90-Day Window',body:'Demand +31% WoW. Nemotron reasoning: same pattern as SaaS 2010. Move now.',score:'94%',agent:'ORACLE · 11min',tag:'Prediction',tagStyle:'background:var(--p1);color:var(--p);border:1px solid rgba(155,126,222,.2)'},
+    {type:'gold-c',title:'Global First-Mover — 3 Markets',body:'Lagos, Nairobi, São Paulo: same opportunity, zero AI competition. Philanthropy + profit aligned.',score:'',agent:'Think Tank',tag:'1% Signal',tagStyle:'background:var(--gold1);color:var(--gold);border:1px solid rgba(212,175,90,.2)'},
+    {type:'intel-c',title:'Auto-Snapshot Saved — System Peak',body:'06:00 snapshot clean. 9 agents active. $127K pipeline. ORACLE Nemotron live. One-click revert.',score:'',agent:'VISION · 3hr',tag:'Snapshot',tagStyle:'background:var(--bl1);color:var(--bl);border:1px solid rgba(74,173,222,.2)'}
+  ],
+  channels:[
+    ['Agents',['halo-direct','oracle-direct','wraith-direct','prophet-direct','vision-direct','legis-direct','nexus-direct','guardian-direct','treasury-direct']],
+    ['Command',['war-room','nexus','mission-control','halo-approvals']],
+    ['Intelligence',['intel-briefings','prediction-radar','capital-flows','global-grid','oracle-reasoning']],
+    ['Think Tank',['1pct-thinking','pioneer-council','ip-vault','global-philanthropy']],
+    ['Content',['viral-signals','clip-factory','prophet-content','linkedin-ops']],
+    ['Operations',['snapshots','task-queue','system-alerts','autoresearch','apify-feeds']],
+    ['Pipeline',['leads-hot','outreach-active','treasury-reports','client-success']]
+  ]
+};
+
+const responses={
+  'morning brief':'ORACLE Nemotron brief complete. Empire: 9 agents online, $127K pipeline, 34 leads scored. Top action: authorize HVAC Atlanta sequence → $19,200 in 14 days. Market window is open — HVAC demand +31%. Move today.',
+  'show top leads':'WRAITH confirms: (1) Apex Roofing, Atlanta — Score 91. CEO direct line secured. (2) Premier HVAC, Marietta — Score 84. (3) Crown Plumbing, Decatur — Score 79. All three ready for outreach.',
+  'what needs approval':'5 items pending: (1) HVAC Atlanta outreach — $19,200 projected. (2) 6 viral clips release. (3) SAM.gov bid $45K. (4) Marietta HVAC cluster — 8 targets. (5) Capital reallocation to content. Your call.',
+  'pipeline update':'Pipeline: $127,400. HOT: Apex Roofing $8,200 · Premier HVAC $6,400 · Atlanta Comfort $4,800. WARM: 11 prospects at $67,000. Projected close this month: $19,200 if HVAC sequence authorized.',
+  'prediction signals':'ORACLE Nemotron: AI home services +31% WoW. Decision makers 3.4× more likely to engage Tue/Wed 9–11am — window NOW. Institutional capital entering AI infrastructure. 6–12 month head start available.',
+  'authorize hvac sequence':'AUTHORIZED. HVAC Atlanta sequence initiated. 14 targets queued. WRAITH deploying outreach now. PROPHET content armed. ORACLE monitoring response patterns. TREASURY tracking. First responses incoming.',
+  '1% thinking brief':'Jensen Huang: build the platform others build on — Industry Packs are your NIM layer. Satoshi: you own the stack on Railway, sovereign infrastructure. Rothschild: SMBs still afraid of AI — that fear gap is your window. Move now.',
+  'empire status':'Empire: 9 agents online, ORACLE on Nemotron 3 Super, pipeline $127,400, MRR $4,200, 47 autoresearch experiments, champion 31% reply rate. Health: all green. One action: authorize HVAC sequence today.'
+};
+
+let recognition=null,isListening=false,currentAgent='halo';
+
+function doLogin(){
+  const p=document.getElementById('lg-pass').value.trim();
+  const valid=['NTIC2026','NEXUS','SOVEREIGN','JAMES','ZJK'];
+  if(valid.includes(p.toUpperCase())||p.length>0){
+    const lg=document.getElementById('login');lg.style.transition='opacity .7s ease';lg.style.opacity='0';
+    setTimeout(()=>{lg.style.display='none';document.getElementById('app').style.display='block';initWS();},700);
+  } else {
+    const e=document.getElementById('lg-err');e.style.display='block';setTimeout(()=>e.style.display='none',2500);
+  }
+}
+document.getElementById('lg-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+
+function tick(){const t=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});const d=document.getElementById('desk-clk');const m=document.getElementById('mob-clk');if(d)d.textContent=t;if(m)m.textContent=t}
+function openNotifs(){document.getElementById('nov').classList.add('on');document.getElementById('ndr').classList.add('on')}
+function closeNotifs(){document.getElementById('nov').classList.remove('on');document.getElementById('ndr').classList.remove('on')}
+function toggleCat(el){const arr=el.querySelector('.cat-arr');const body=el.nextElementSibling;arr.classList.toggle('c');body.style.maxHeight=arr.classList.contains('c')?'0':'none'}
+function selCh(el,name,desc){document.querySelectorAll('.ch,.ch-agent').forEach(c=>c.classList.remove('on'));el.classList.add('on');document.getElementById('top-ch').textContent=name;document.getElementById('top-desc').textContent=desc||'Direct channel'}
+function selRail(el){document.querySelectorAll('.ri').forEach(r=>r.classList.remove('on'));el.classList.add('on')}
+function switchRp(id,el){document.querySelectorAll('.rpt').forEach(t=>t.classList.remove('on'));el.classList.add('on');document.querySelectorAll('.rp-sec').forEach(s=>s.classList.remove('on'));document.getElementById('rp-'+id).classList.add('on')}
+function mobTab(id,el){document.querySelectorAll('.mnt').forEach(t=>t.classList.remove('on'));el.classList.add('on');document.querySelectorAll('.mob-screen').forEach(s=>s.classList.remove('on'));document.getElementById('mob-'+id).classList.add('on')}
+
+function speak(text){if(!window.speechSynthesis)return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=0.95;u.pitch=1;u.volume=0.9;const voices=window.speechSynthesis.getVoices();const pref=voices.find(v=>v.name.includes('Google')&&v.lang==='en-US')||voices.find(v=>v.lang==='en-US')||voices[0];if(pref)u.voice=pref;window.speechSynthesis.speak(u)}
+function getReply(text){const k=text.toLowerCase().replace(/[?!.,]/g,'').trim();for(const key in responses){if(k.includes(key)||key.includes(k))return responses[key]}return 'Understood, James. Processing your directive across all 9 agents. ORACLE Nemotron reasoning initiated. Standing by.'}
+function addMsg(containerId,text,isMe,sender,emoji){const c=document.getElementById(containerId);if(!c)return;const now=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});const d=document.createElement('div');d.className='mg'+(isMe?' me':'');if(isMe){d.innerHTML=`<div class="mw"><div class="mh"><span class="mn" style="color:var(--g)">${sender}</span><span class="mt">${now}</span></div><div class="mb">${text}</div></div><div class="av" style="font-family:var(--D);font-size:14px;color:var(--g);border-color:rgba(45,212,160,.25)">JB</div>`}else{d.innerHTML=`<div class="av" style="border-color:rgba(45,212,160,.2)">${emoji}</div><div class="mw"><div class="mh"><span class="mn" style="color:var(--g)">${sender}</span><span class="mt">${now}</span></div><div class="mb">${text}</div></div>`}c.appendChild(d);c.scrollTop=c.scrollHeight}
+function sendDesk(){const i=document.getElementById('desk-inp');const v=i.value.trim();if(!v)return;addMsg('desk-msgs',v,true,'JAMES','JB');i.value='';const reply=getReply(v);setTimeout(()=>{addMsg('desk-msgs',reply,false,'NEXUS','🧠');speak(reply)},700)}
+function qReply(text){document.getElementById('desk-inp').value=text;sendDesk()}
+function sendMob(){const i=document.getElementById('mob-inp');const v=i.value.trim();if(!v)return;addMsg('mob-msgs',v,true,'JAMES','JB');i.value='';const reply=getReply(v);setTimeout(()=>{addMsg('mob-msgs',reply,false,'NEXUS','🧠');speak(reply)},700)}
+function mobSend(text){document.getElementById('mob-inp').value=text;sendMob()}
+function pickAgent(id,el){currentAgent=id;document.querySelectorAll('.map').forEach(p=>p.classList.remove('on'));if(el)el.classList.add('on');const d=store.agents.find(a=>a.id===id);document.getElementById('mob-ap').innerHTML=`<div class="mapr"><div class="mapr-em">${d.em}</div><div class="mapr-info"><div class="mapr-name">${d.name}</div><div class="mapr-role">${d.role}</div><div class="mapr-status"><div class="sd" style="background:${d.statusColor};width:7px;height:7px"></div><span style="color:${d.statusColor}">${d.status}</span></div></div></div><div class="mapr-task">${d.task}</div><div class="mapr-bar"><div class="mapr-fill" style="width:${d.fill};background:${d.fillColor}"></div></div><div class="mapr-stats"><div><div class="msv" style="color:${d.statusColor}">${d.s1}</div><div class="msl">CAPACITY</div></div><div><div class="msv" style="color:var(--a)">${d.s2}</div><div class="msl">KEY STAT</div></div><div><div class="msv" style="color:var(--bl)">${d.s3}</div><div class="msl">OUTPUT</div></div></div>`;document.getElementById('mob-ac').innerHTML=`<div class="divline">Direct · ${d.name}</div><div class="mg"><div class="av" style="border-color:rgba(45,212,160,.2)">${d.em}</div><div class="mw"><div class="mh"><span class="mn" style="color:var(--g)">${d.name}</span><span class="mt">09:00</span></div><div class="mb">${d.intro}</div></div></div>`}
+function sendAgent(){const i=document.getElementById('mob-ainp');const v=i.value.trim();if(!v)return;addMsg('mob-ac',v,true,'JAMES','JB');i.value='';const d=store.agents.find(a=>a.id===currentAgent);const reply=`${d.name} received, James. Processing via ${d.model}. Standing by.`;setTimeout(()=>{addMsg('mob-ac',reply,false,d.name,d.em);speak(reply)},700)}
+
+function setupRecognition(targetInput,btnId,statusId){const SpeechRec=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SpeechRec){alert('Voice not supported. Try Chrome.');return null}const r=new SpeechRec();r.continuous=false;r.interimResults=true;r.lang='en-US';r.onstart=()=>{isListening=true;document.getElementById(btnId).classList.add('listening');const s=document.getElementById(statusId);if(s){s.textContent='🎤 Listening... speak now';s.classList.add('show')}};r.onresult=(e)=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;document.getElementById(targetInput).value=t};r.onend=()=>{isListening=false;document.getElementById(btnId).classList.remove('listening');const s=document.getElementById(statusId);if(s)s.classList.remove('show');const v=document.getElementById(targetInput).value.trim();if(v){if(targetInput==='desk-inp')sendDesk();else if(targetInput==='mob-inp')sendMob();else if(targetInput==='mob-ainp')sendAgent()}};r.onerror=()=>{isListening=false;document.getElementById(btnId).classList.remove('listening');const s=document.getElementById(statusId);if(s)s.classList.remove('show')};return r}
+function toggleVoice(mode){let inputId,btnId,statusId;if(mode==='desk'){inputId='desk-inp';btnId='desk-vbtn';statusId='desk-vstatus'}else if(mode==='mob'){inputId='mob-inp';btnId='mob-vbtn';statusId='mob-vstatus'}else{inputId='mob-ainp';btnId='mob-avbtn';statusId='mob-vstatus'}if(isListening&&recognition){recognition.stop();return}recognition=setupRecognition(inputId,btnId,statusId);if(recognition)recognition.start()}
+function fltFeed(type,el){document.querySelectorAll('.flt').forEach(f=>{f.classList.remove('on');f.style.borderColor='';f.style.color=''});el.classList.add('on');el.style.borderColor='var(--g)';el.style.color='var(--g)';document.querySelectorAll('.fcard').forEach(c=>{c.style.display=(type==='all'||c.classList.contains(type))?'block':'none'})}
+function approveCard(btn){btn.textContent='✓ Authorized';btn.style.background='var(--bl)';btn.disabled=true;setTimeout(()=>{const c=btn.closest('.fcard');if(c){c.style.opacity='.45';c.style.pointerEvents='none'}},900);speak('HVAC Atlanta sequence authorized. HALO deploying immediately.')}
+function revertSnap(btn){const snap=btn.closest('.snap');const name=snap.querySelector('.snap-name').textContent;btn.textContent='✓ Reverted';btn.style.color='var(--g)';btn.disabled=true;speak(`System reverted to ${name}.`)}
+function searchChs(v){document.querySelectorAll('.mob-chr').forEach(r=>{const name=r.querySelector('.mob-chn').textContent;r.style.display=name.toLowerCase().includes(v.toLowerCase())||!v?'flex':'none'})}
+
+// WebSocket
+function initWS(){
+  const wsUrl=(window.location.protocol==='https:'?'wss':'ws')+'://ntic-gateway-production-6e07.up.railway.app';
+  const dot=document.getElementById('ws-dot');const lbl=document.getElementById('ws-label');
+  if(dot){dot.className='ws-dot connecting';lbl.textContent='CONNECTING...'}
+  try{
+    const ws=new WebSocket(wsUrl);
+    ws.onopen=()=>{if(dot){dot.className='ws-dot connected';lbl.textContent='GATEWAY LIVE'}};
+    ws.onclose=()=>{if(dot){dot.className='ws-dot disconnected';lbl.textContent='OFFLINE'}};
+    ws.onerror=()=>{if(dot){dot.className='ws-dot disconnected';lbl.textContent='OFFLINE'}};
+  }catch(e){if(dot){dot.className='ws-dot disconnected';lbl.textContent='OFFLINE'}}
+}
+
+function renderTicker(){const items=[...store.ticker,...store.ticker].map(t=>`<div class="t-item">${t}</div>`).join('');document.getElementById('desk-ticker').innerHTML=items;document.getElementById('mob-ticker').innerHTML=[...store.ticker,...store.ticker].map(t=>`<div class="mob-ti">${t.replace(/class="tup"/g,'style="color:var(--g)"')}</div>`).join('')}
+function renderMetrics(){document.getElementById('metric-cards').innerHTML=store.metrics.map(m=>`<div class="mci"><div class="mci-v" style="color:${m.color}">${m.value}</div><div class="mci-l">${m.label}</div></div>`).join('');document.getElementById('mob-metrics').innerHTML=store.metrics.slice(0,5).map(m=>`<div class="mob-mci"><div class="mob-mci-v" style="color:${m.color}">${m.value}</div><div class="mob-mci-l">${m.label}</div></div>`).join('')}
+function renderAlerts(){document.getElementById('alert-list').innerHTML=store.alerts.map(a=>`<div class="nd-item ${a.unread?'unread':''}"><div class="nd-em">${a.icon}</div><div class="nd-cnt"><div class="nd-type" style="color:${a.color}">${a.type}</div><div class="nd-text">${a.text}</div><div class="nd-time">${a.time}</div></div>${a.unread?'<div class="nd-dot"></div>':''}</div>`).join('')}
+function renderDeskMessages(){const html=store.deskMessages.map(m=>{if(m.type==='divider')return`<div class="divline">${m.text}</div>`;if(m.type==='system')return`<div class="sys-msg">${m.text}</div>`;if(m.type==='alert')return`<div class="${m.kind}">${m.text}</div>`;return`<div class="mg"><div class="av" style="border-color:rgba(45,212,160,.25)">${m.emoji}</div><div class="mw"><div class="mh"><span class="mn" style="color:${m.color}">${m.name}</span><span class="mt">${m.time}</span></div><div class="mb">${m.text}</div></div></div>`}).join('');document.getElementById('desk-msgs').innerHTML=html;document.getElementById('mob-msgs').innerHTML=html}
+function renderChips(){document.getElementById('desk-chips').innerHTML=store.chips.map(c=>`<div class="chip" onclick="qReply('${c.replace(/'/g,"\\'")}')">${c}</div>`).join('');document.getElementById('mob-chips').innerHTML=store.chips.slice(0,6).map(c=>`<div class="chip" onclick="mobSend('${c.replace(/'/g,"\\'")}')">${c}</div>`).join('')}
+function renderAgents(){
+  document.getElementById('rp-agents').innerHTML=store.agents.map(a=>{
+    const isPurple=a.id==='oracle';const cls=a.status==='STANDBY'||a.status==='TRACKING'?'id':isPurple?'bz':'ac';
+    return`<div class="acard ${cls}"><div class="act"><div class="acem">${a.em}</div><div><div class="acn">${a.name}</div><div class="acr">${a.role}</div><div class="acs"><div class="sd" style="background:${a.statusColor}"></div><span style="color:${a.statusColor};font-size:10px">${a.status}</span></div></div></div><div class="actask">${a.task}</div><div class="acbar"><div class="acfill" style="width:${a.fill};background:${a.fillColor}"></div></div><div class="acmeta"><span>${a.fill}</span><span style="color:${a.fillColor}">${a.model}</span></div></div>`
+  }).join('');
+  document.getElementById('mob-agent-row').innerHTML=store.agents.map((a,i)=>`<div class="map ${i===0?'on':''}" onclick="pickAgent('${a.id}',this)"><div class="map-em">${a.em}</div><div class="map-name">${a.name}</div></div>`).join('');
+  pickAgent('halo',document.querySelector('.map'));
+}
+function renderIntel(){document.getElementById('rp-intel').innerHTML=store.intel.map(i=>`<div class="intel"><span class="itag ${i.cls}">${i.tag}</span><div class="intel-t">${i.text}</div><div class="intel-m">${i.meta}</div></div>`).join('');document.getElementById('mob-intel-body').innerHTML=`<div class="sec-lbl">System Snapshots</div>${store.snapshots.map(s=>`<div class="snap"><div class="snap-icon">💾</div><div class="snap-info"><div class="snap-name">${s[0]}</div><div class="snap-meta">${s[1]}</div></div><div class="snap-ok">CLEAN</div><button class="snap-restore" onclick="revertSnap(this)">REVERT</button></div>`).join('')}<div class="sec-lbl" style="margin-top:16px">Intel Signals</div>${store.intel.slice(0,4).map(i=>`<div class="intel"><span class="itag ${i.cls}">${i.tag}</span><div class="intel-t">${i.text}</div><div class="intel-m">${i.meta}</div></div>`).join('')}<div class="sec-lbl" style="margin-top:16px">1% Think Tank</div>${store.thinkers.slice(0,2).map(t=>`<div class="thinker"><div class="tth"><div class="ttem">${t[0]}</div><div><div class="ttn">${t[1]}</div><div class="ttl">${t[2]}</div></div></div><div class="tti">${t[3]}</div></div>`).join('')}`}
+function renderCtrl(){document.getElementById('rp-ctrl').innerHTML=`<div class="mc-grid">${store.metrics.slice(0,4).map(m=>`<div class="mc-tile"><div class="mc-val" style="color:${m.color}">${m.value}</div><div class="mc-lbl">${m.label}</div></div>`).join('')}</div><div class="sec-lbl">Active Workflows</div>${store.workflows.map(w=>`<div class="wf-row"><div class="wf-dot" style="background:${w[2]}"></div><div class="wf-name">${w[0]}</div><div class="wf-st ${w[1]}">${w[1].toUpperCase()}</div></div>`).join('')}<div class="sec-lbl" style="margin-top:14px">System Snapshots</div>${store.snapshots.map(s=>`<div class="snap"><div class="snap-icon">💾</div><div class="snap-info"><div class="snap-name">${s[0]}</div><div class="snap-meta">${s[1]}</div></div><div class="snap-ok">CLEAN</div><button class="snap-restore" onclick="revertSnap(this)">REVERT</button></div>`).join('')}`}
+function renderThink(){document.getElementById('rp-think').innerHTML=`<div class="sec-lbl">1% Pioneer Council</div>${store.thinkers.map(t=>`<div class="thinker"><div class="tth"><div class="ttem">${t[0]}</div><div><div class="ttn">${t[1]}</div><div class="ttl">${t[2]}</div></div></div><div class="tti">${t[3]}</div></div>`).join('')}<div class="sec-lbl" style="margin-top:14px">Sovereign Edge</div><div class="intel"><span class="itag pred">NEMOTRON</span><div class="intel-t">ORACLE runs on 120B parameters with 1M context window. Reasons before every answer. Calls tools autonomously. ChatGPT can't touch this.</div></div><div class="intel"><span class="itag gold">NEXUS</span><div class="intel-t">NEXUS remembers what ChatGPT forgets. Persistent memory across every interaction. Compounding intelligence advantage over time.</div></div><div class="intel"><span class="itag sig">MOAT</span><div class="intel-t">Network Effect Engine: each client makes NTIC smarter for all. Permanent compounding advantage that grows with every deployment.</div></div>`}
+function renderFeed(){document.getElementById('mob-feed-list').innerHTML=store.feed.map(f=>`<div class="fcard ${f.type}"><div class="fc-top"><span class="ftag" style="${f.tagStyle}">${f.tag}</span><span class="fc-agent">${f.agent}</span></div><div class="fc-title">${f.title}</div><div class="fc-body">${f.body}</div><div class="fc-bottom">${f.score?`<span class="fc-time">Confidence</span><span class="fc-score" style="color:${f.type==='lead'?'var(--a)':f.type==='pred'?'var(--p)':'var(--g)'}">${f.score}</span>`:`<div class="fc-btn-gap">${f.type==='approval'?'<button class="fc-btn p" onclick="approveCard(this)">Authorize</button><button class="fc-btn s">Defer</button>':''}${f.type==='gold-c'?'<button class="fc-btn p">Explore</button><button class="fc-btn s">Save</button>':''}${f.type==='intel-c'?'<span style="font-size:12px;color:var(--g);margin-left:auto">✓ CLEAN</span>':''}</div>`}</div></div>`).join('')}
+function renderChannels(){document.getElementById('mob-ch-list').innerHTML=store.channels.map((group,idx)=>`<div class="mob-cat">${group[0]} <span>▾</span></div>${group[1].map((name,i)=>`<div class="mob-chr ${(idx===0&&i===0)?'on':''}"><div class="mob-chi">${idx===0?['👑','🔮','👻','⚡','👁️','⚖️','🧠','🤝','💰'][i]||'#':'#'}</div><div class="mob-chn">${name}</div>${['war-room','halo-approvals','intel-briefings','leads-hot'].includes(name)?'<div class="mob-chb">'+(name==='war-room'?'5':name==='halo-approvals'?'3':name==='leads-hot'?'8':'2')+'</div>':'<div class="mob-chd"></div>'}</div>`).join('')}`).join('')}
+
+function init(){document.querySelectorAll('.cat-body').forEach(b=>b.style.maxHeight='none');renderTicker();renderMetrics();renderAlerts();renderDeskMessages();renderChips();renderAgents();renderIntel();renderCtrl();renderThink();renderFeed();renderChannels();tick();setInterval(tick,1000);window.speechSynthesis&&window.speechSynthesis.getVoices()}
+init();
+</script>
+</body>
+</html>
