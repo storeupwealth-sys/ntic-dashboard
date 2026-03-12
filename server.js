@@ -7,6 +7,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static(join(__dirname, 'public')));
-app.get('*', (req, res) => res.sendFile(join(__dirname, 'public', 'index.html')));
 
-app.listen(PORT, '0.0.0.0', () => console.log(`NTIC Dashboard live on ${PORT}`));
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    service: 'ntic-dashboard',
+    version: 'v7'
+  });
+});
+
+app.get('*', (req, res) => {
+  res.sendFile(join(__dirname, 'public', 'index.html'));
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`NTIC Dashboard live on ${PORT}`);
+});
