@@ -2,6 +2,28 @@
   "name": "ntic-dashboard",
   "version": "1.0.0",
   "type": "module",
-  "scripts": { "start": "node server.js" },
-  "dependencies": { "express": "^4.18.2" }
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^4.22.1",
+    "node-fetch": "^3.3.2",
+    "pg": "^8.20.0"
+  },
+  "description": "",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/storeupwealth-sys/ntic-dashboard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/storeupwealth-sys/ntic-dashboard/issues"
+  },
+  "homepage": "https://github.com/storeupwealth-sys/ntic-dashboard#readme"
 }
