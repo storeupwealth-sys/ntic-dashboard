@@ -2,485 +2,1231 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>NEXUS Command Center</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>NEXUS THRONE — Mission Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap');
-  
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  
-  :root {
-    --bg: #06080F; --surface: #0C1019; --card: #111827; --card-hover: #1a2235;
-    --gold: #D4AF37; --gold-glow: rgba(212,175,55,0.3); --cyan: #00E5FF; --cyan-glow: rgba(0,229,255,0.15);
-    --purple: #A855F7; --purple-glow: rgba(168,85,247,0.15); --green: #10B981; --red: #EF4444;
-    --orange: #F59E0B; --blue: #3B82F6;
-    --text: #F1F5F9; --text-muted: #64748B; --text-dim: #334155;
-    --border: rgba(255,255,255,0.06); --glass: rgba(255,255,255,0.03);
-    --radius: 16px; --radius-sm: 10px; --radius-xs: 6px;
-  }
-  
-  body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
-  
-  /* GRID LINES BACKGROUND */
-  body::before {
-    content: ''; position: fixed; inset: 0; z-index: 0;
-    background: 
-      linear-gradient(rgba(212,175,55,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(212,175,55,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask: radial-gradient(ellipse at 50% 0%, black 0%, transparent 70%);
-  }
-  
-  /* HEADER */
-  .header {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(6,8,15,0.85); backdrop-filter: blur(20px) saturate(180%);
-    border-bottom: 1px solid var(--border); padding: 12px 16px;
-  }
-  .header-top { display: flex; justify-content: space-between; align-items: center; }
-  .header-brand { display: flex; align-items: center; gap: 10px; }
-  .header-brand .crown { font-size: 22px; }
-  .header-brand h1 { font-size: 15px; font-weight: 700; letter-spacing: 2px; background: linear-gradient(135deg, var(--gold), #FDE68A); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .header-brand .sub { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; margin-top: 1px; }
-  .header-status { display: flex; gap: 6px; align-items: center; }
-  .status-pip { width: 6px; height: 6px; border-radius: 50%; }
-  .pip-on { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse-pip 2s infinite; }
-  .pip-warn { background: var(--orange); box-shadow: 0 0 8px var(--orange); }
-  @keyframes pulse-pip { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
-  .status-text { font-size: 10px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#06080F;--bg2:#0a0e18;--glass:rgba(255,255,255,0.04);--glass2:rgba(255,255,255,0.07);--glass-border:rgba(255,255,255,0.08);
+--gold:#D4AF37;--cyan:#00E5FF;--purple:#A855F7;--red:#EF4444;--orange:#F59E0B;--green:#22C55E;
+--text:#E2E8F0;--text2:#94A3B8;--text3:#64748B;
+--font-data:'JetBrains Mono',monospace;--font-text:'Inter',sans-serif;
+--radius:12px;--radius-sm:8px;
+}
+html{font-size:14px;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:var(--font-text);overflow-x:hidden;min-height:100vh;position:relative}
+body::before{content:'';position:fixed;inset:0;background:
+  linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);
+  background-size:40px 40px;
+  mask-image:radial-gradient(ellipse at 50% 30%,black 20%,transparent 70%);
+  -webkit-mask-image:radial-gradient(ellipse at 50% 30%,black 20%,transparent 70%);
+  pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;
+  background:radial-gradient(circle at 30% 20%,rgba(0,229,255,0.03),transparent 40%),
+  radial-gradient(circle at 70% 80%,rgba(168,85,247,0.03),transparent 40%),
+  radial-gradient(circle at 50% 50%,rgba(212,175,55,0.02),transparent 50%);
+  pointer-events:none;z-index:0}
 
-  /* METRICS BAR */
-  .metrics-bar {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
-    padding: 12px 16px; border-bottom: 1px solid var(--border);
-  }
-  .metric-mini {
-    background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius-sm);
-    padding: 10px; text-align: center; position: relative; overflow: hidden;
-  }
-  .metric-mini::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
-  .metric-mini .val { font-size: 20px; font-weight: 900; background: linear-gradient(135deg, var(--gold), #FDE68A); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .metric-mini .lbl { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+.glass{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);position:relative;overflow:hidden}
+.glass::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);animation:shimmer 3s ease-in-out infinite}
+@keyframes shimmer{0%,100%{opacity:0.3}50%{opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+@keyframes glow-pulse{0%,100%{box-shadow:0 0 5px currentColor}50%{box-shadow:0 0 20px currentColor,0 0 40px currentColor}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes scan{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes borderGlow{0%,100%{border-color:rgba(212,175,55,0.2)}50%{border-color:rgba(212,175,55,0.5)}}
 
-  /* NAV TABS */
-  .nav-tabs {
-    display: flex; gap: 4px; padding: 8px 16px; overflow-x: auto; scrollbar-width: none;
-    border-bottom: 1px solid var(--border); -webkit-overflow-scrolling: touch;
-  }
-  .nav-tabs::-webkit-scrollbar { display: none; }
-  .nav-tab {
-    flex-shrink: 0; padding: 8px 16px; border-radius: 999px; font-size: 12px; font-weight: 600;
-    color: var(--text-muted); cursor: pointer; transition: all 0.2s; border: 1px solid transparent;
-    white-space: nowrap; user-select: none;
-  }
-  .nav-tab:hover { color: var(--text); background: var(--glass); }
-  .nav-tab.active { color: var(--gold); background: var(--gold-glow); border-color: rgba(212,175,55,0.2); }
+.app{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh;padding-bottom:70px}
 
-  /* CONTENT AREA */
-  .content { padding: 16px; position: relative; z-index: 1; }
-  .panel { display: none; }
-  .panel.active { display: block; animation: fadeUp 0.3s ease; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+/* HEADER */
+.header{padding:12px 16px 8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.header-left h1{font-size:1rem;font-weight:700;color:var(--gold);font-family:var(--font-data);letter-spacing:1px;display:flex;align-items:center;gap:6px}
+.header-left p{font-size:0.7rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.status-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:20px;font-size:0.75rem;font-family:var(--font-data);font-weight:600;cursor:pointer;transition:all 0.3s}
+.status-pill.operational{background:rgba(34,197,94,0.15);color:var(--green);border:1px solid rgba(34,197,94,0.3)}
+.status-pill.operational:hover{background:rgba(34,197,94,0.25)}
+.status-pill .dot{width:8px;height:8px;border-radius:50%;background:currentColor;animation:pulse 2s infinite}
+.header-right{display:flex;align-items:center;gap:12px;font-family:var(--font-data);font-size:0.8rem}
+.clock{color:var(--cyan)}
+.mode-badge{color:var(--purple);font-size:0.65rem;padding:2px 8px;border:1px solid rgba(168,85,247,0.3);border-radius:10px}
+.heartbeat{width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+.header-sub{width:100%;text-align:center;font-size:0.65rem;color:var(--text3);font-family:var(--font-data);letter-spacing:1px;padding:4px 0;border-top:1px solid var(--glass-border);margin-top:4px}
 
-  /* GLASS CARD */
-  .glass {
-    background: linear-gradient(135deg, rgba(17,24,39,0.8), rgba(17,24,39,0.4));
-    border: 1px solid var(--border); border-radius: var(--radius);
-    backdrop-filter: blur(10px); padding: 16px; margin-bottom: 12px;
-    position: relative; overflow: hidden;
-  }
-  .glass::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
-  .glass-gold::after { content: ''; position: absolute; top: -50%; right: -50%; width: 100%; height: 100%; background: radial-gradient(circle, var(--gold-glow), transparent 70%); pointer-events: none; }
-  .glass-cyan::after { content: ''; position: absolute; top: -50%; right: -50%; width: 100%; height: 100%; background: radial-gradient(circle, var(--cyan-glow), transparent 70%); pointer-events: none; }
-  .glass-purple::after { content: ''; position: absolute; top: -50%; left: -50%; width: 100%; height: 100%; background: radial-gradient(circle, var(--purple-glow), transparent 70%); pointer-events: none; }
+/* STATUS POPUP */
+.status-popup{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1000;padding:24px;width:90%;max-width:400px;animation:fadeUp 0.3s}
+.status-popup.show{display:block}
+.status-popup h3{color:var(--gold);margin-bottom:12px;font-family:var(--font-data)}
+.status-popup .svc{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:0.85rem}
+.status-popup .svc .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:999}
+.overlay.show{display:block}
 
-  /* SECTION HEADERS */
-  .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-  .section-label .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); }
+/* KPI ROW */
+.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding:8px 16px;overflow-x:auto}
+.kpi-card{padding:12px;text-align:center;min-width:120px;transition:transform 0.3s,box-shadow 0.3s}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,0.3)}
+.kpi-card .label{font-size:0.6rem;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:4px}
+.kpi-card .value{font-size:1.4rem;font-weight:700;font-family:var(--font-data)}
+.kpi-card .sub{font-size:0.65rem;color:var(--text2);margin-top:2px}
 
-  /* KANBAN */
-  .kanban-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; }
-  .kanban-scroll::-webkit-scrollbar { height: 2px; }
-  .kanban-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-  .kanban-col { min-width: 280px; max-width: 300px; flex-shrink: 0; scroll-snap-align: start; }
-  .kanban-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
-  .kanban-header .cnt { background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 500; }
-  .col-queue .kanban-header { color: var(--text-muted); }
-  .col-active .kanban-header { color: var(--cyan); }
-  .col-review .kanban-header { color: var(--orange); }
-  .col-done .kanban-header { color: var(--green); }
+/* ALERTS */
+.alert-strip{overflow:hidden;padding:6px 0;border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border);position:relative}
+.alert-track{display:flex;gap:16px;animation:marquee 30s linear infinite;width:max-content}
+.alert-track:hover{animation-play-state:paused}
+.alert-item{display:flex;align-items:center;gap:8px;padding:4px 12px;border-radius:20px;font-size:0.7rem;font-family:var(--font-data);white-space:nowrap;cursor:pointer;transition:opacity 0.3s}
+.alert-item .x{margin-left:4px;opacity:0.5;cursor:pointer}
+.alert-item .x:hover{opacity:1}
+.alert-item.critical{background:rgba(239,68,68,0.15);color:var(--red);border:1px solid rgba(239,68,68,0.2)}
+.alert-item.warning{background:rgba(245,158,11,0.15);color:var(--orange);border:1px solid rgba(245,158,11,0.2)}
+.alert-item.info{background:rgba(0,229,255,0.1);color:var(--cyan);border:1px solid rgba(0,229,255,0.2)}
+.alert-item.success{background:rgba(34,197,94,0.1);color:var(--green);border:1px solid rgba(34,197,94,0.2)}
 
-  .task-card {
-    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
-    padding: 12px; margin-bottom: 8px; cursor: default; transition: transform 0.15s, border-color 0.15s;
-  }
-  .task-card:active { transform: scale(0.98); }
-  .task-card.priority-high { border-left: 3px solid var(--red); }
-  .task-card.priority-med { border-left: 3px solid var(--orange); }
-  .task-card.priority-low { border-left: 3px solid var(--green); }
-  .task-card .title { font-size: 13px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; }
-  .task-card .meta { display: flex; justify-content: space-between; align-items: center; }
-  .task-card .agent-tag { font-size: 9px; padding: 3px 8px; border-radius: 999px; font-weight: 600; }
-  .tag-halo { background: rgba(212,175,55,0.15); color: var(--gold); }
-  .tag-wraith { background: rgba(168,85,247,0.15); color: var(--purple); }
-  .tag-oracle { background: rgba(0,229,255,0.15); color: var(--cyan); }
-  .tag-prophet { background: rgba(245,158,11,0.15); color: var(--orange); }
-  .tag-forge { background: rgba(16,185,129,0.15); color: var(--green); }
-  .tag-vision { background: rgba(239,68,68,0.15); color: var(--red); }
-  .tag-herald { background: rgba(168,85,247,0.15); color: #DA77F2; }
-  .tag-treasury { background: rgba(16,185,129,0.15); color: #69DB7C; }
-  .tag-nexus { background: rgba(212,175,55,0.15); color: var(--gold); }
-  .task-card .time { font-size: 10px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+/* TABS */
+.tab-bar{display:flex;gap:2px;padding:8px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-btn{padding:8px 16px;border:none;background:transparent;color:var(--text3);font-family:var(--font-data);font-size:0.75rem;cursor:pointer;border-radius:var(--radius-sm);white-space:nowrap;transition:all 0.3s;position:relative}
+.tab-btn.active{color:var(--gold);background:rgba(212,175,55,0.1)}
+.tab-btn.active::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;background:var(--gold);border-radius:1px}
+.tab-btn:hover:not(.active){color:var(--text);background:var(--glass)}
 
-  /* AGENTS */
-  .agent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
-  .agent-card {
-    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 14px; position: relative; overflow: hidden; transition: border-color 0.2s;
-  }
-  .agent-card:active { border-color: rgba(255,255,255,0.1); }
-  .agent-card .agent-icon { font-size: 24px; margin-bottom: 6px; }
-  .agent-card .agent-name { font-size: 12px; font-weight: 700; letter-spacing: 1px; }
-  .agent-card .agent-role { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-  .agent-card .agent-status { margin-top: 8px; font-size: 10px; display: flex; align-items: center; gap: 4px; }
-  .agent-card .agent-status .dot { width: 5px; height: 5px; border-radius: 50%; }
+/* TAB CONTENT */
+.tab-content{flex:1;padding:0 16px 16px;position:relative}
+.tab-panel{display:none;animation:fadeUp 0.4s ease}
+.tab-panel.active{display:block}
 
-  /* PIPELINE TABLE */
-  .pipe-card { margin-bottom: 10px; }
-  .pipe-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 6px; }
-  .pipe-row:active { background: var(--card-hover); }
-  .pipe-info { flex: 1; }
-  .pipe-name { font-size: 13px; font-weight: 600; }
-  .pipe-cat { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-  .pipe-score { text-align: right; }
-  .score-ring { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
-  .ring-high { background: rgba(16,185,129,0.15); color: var(--green); border: 2px solid var(--green); }
-  .ring-med { background: rgba(245,158,11,0.15); color: var(--orange); border: 2px solid var(--orange); }
-  .pipe-value { font-size: 10px; color: var(--text-muted); margin-top: 4px; text-align: right; }
+/* COMMAND TAB */
+.cmd-layout{display:grid;grid-template-columns:1fr 300px;gap:12px}
+@media(max-width:768px){.cmd-layout{grid-template-columns:1fr}.kpi-row{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:480px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
 
-  /* CALENDAR */
-  .cal-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 16px; }
-  .cal-day-hdr { text-align: center; font-size: 10px; color: var(--text-dim); font-weight: 600; padding: 6px 0; }
-  .cal-cell { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xs); min-height: 70px; padding: 6px; }
-  .cal-cell.today { border-color: var(--gold); box-shadow: 0 0 12px var(--gold-glow); }
-  .cal-num { font-size: 11px; font-weight: 600; color: var(--text-dim); margin-bottom: 4px; }
-  .cal-cell.today .cal-num { color: var(--gold); }
-  .cal-evt { font-size: 8px; padding: 2px 4px; border-radius: 3px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .evt-cron { background: rgba(0,229,255,0.1); color: var(--cyan); }
-  .evt-task { background: rgba(212,175,55,0.1); color: var(--gold); }
-  .evt-launch { background: rgba(239,68,68,0.1); color: var(--red); }
-  .evt-review { background: rgba(168,85,247,0.1); color: var(--purple); }
+.war-room{max-height:400px;overflow-y:auto;padding:12px;scrollbar-width:thin;scrollbar-color:var(--glass-border) transparent}
+.war-room::-webkit-scrollbar{width:4px}
+.war-room::-webkit-scrollbar-thumb{background:var(--glass-border);border-radius:2px}
+.feed-entry{display:flex;align-items:flex-start;gap:10px;padding:8px;border-radius:var(--radius-sm);margin-bottom:6px;animation:slideIn 0.4s ease;transition:background 0.2s}
+.feed-entry:hover{background:var(--glass)}
+.feed-entry .agent-icon{font-size:1.2rem;flex-shrink:0}
+.feed-entry .content{flex:1}
+.feed-entry .ts{font-size:0.6rem;color:var(--text3);font-family:var(--font-data)}
+.feed-entry .msg{font-size:0.8rem;margin-top:2px}
+.feed-entry .badge{display:inline-block;padding:1px 6px;border-radius:8px;font-size:0.6rem;font-family:var(--font-data);margin-top:2px}
+.badge-success{background:rgba(34,197,94,0.15);color:var(--green)}
+.badge-active{background:rgba(0,229,255,0.15);color:var(--cyan)}
+.badge-pending{background:rgba(245,158,11,0.15);color:var(--orange)}
 
-  /* COMMS */
-  .msg-list { max-height: 60vh; overflow-y: auto; }
-  .msg-item { display: flex; gap: 10px; padding: 12px; border-bottom: 1px solid var(--border); }
-  .msg-item:active { background: var(--glass); }
-  .msg-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-  .msg-avatar.av-tg { background: rgba(0,229,255,0.15); }
-  .msg-avatar.av-dc { background: rgba(168,85,247,0.15); }
-  .msg-avatar.av-sys { background: rgba(212,175,55,0.15); }
-  .msg-body { flex: 1; min-width: 0; }
-  .msg-from { font-size: 12px; font-weight: 600; }
-  .msg-preview { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-  .msg-time { font-size: 9px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; margin-top: 4px; }
+.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.qa-btn{padding:16px 12px;border:1px solid var(--glass-border);border-radius:var(--radius);background:var(--glass);color:var(--text);cursor:pointer;text-align:center;font-family:var(--font-text);font-size:0.75rem;transition:all 0.3s;position:relative;overflow:hidden}
+.qa-btn:hover{border-color:var(--gold);box-shadow:0 0 20px rgba(212,175,55,0.1);transform:translateY(-1px)}
+.qa-btn.danger{border-color:rgba(239,68,68,0.3)}
+.qa-btn.danger:hover{border-color:var(--red);box-shadow:0 0 20px rgba(239,68,68,0.2)}
+.qa-btn .icon{font-size:1.5rem;margin-bottom:4px}
+.qa-btn .lbl{font-weight:600}
 
-  .compose-bar {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
-    background: rgba(6,8,15,0.95); backdrop-filter: blur(20px);
-    border-top: 1px solid var(--border); padding: 10px 16px; display: none;
-  }
-  .compose-bar.show { display: flex; gap: 8px; align-items: center; }
-  .compose-input {
-    flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 999px;
-    padding: 10px 16px; color: var(--text); font-size: 14px; outline: none; font-family: 'Inter', sans-serif;
-  }
-  .compose-input:focus { border-color: var(--gold); }
-  .compose-send {
-    width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #FDE68A);
-    border: none; color: var(--bg); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-  }
-  .channel-pills { display: flex; gap: 6px; margin-bottom: 10px; overflow-x: auto; }
-  .channel-pill { padding: 6px 14px; border-radius: 999px; font-size: 11px; font-weight: 600; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; white-space: nowrap; }
-  .channel-pill.active { border-color: var(--gold); color: var(--gold); background: var(--gold-glow); }
+.services-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+@media(max-width:768px){.services-grid{grid-template-columns:repeat(2,1fr)}}
+.svc-item{display:flex;align-items:center;gap:6px;padding:8px;border-radius:var(--radius-sm);background:var(--glass);font-size:0.7rem;font-family:var(--font-data)}
+.svc-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;animation:pulse 2s infinite}
 
-  /* VENTURES */
-  .venture-card {
-    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 16px; margin-bottom: 10px; position: relative; overflow: hidden;
-  }
-  .venture-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; }
-  .venture-card.v-alpha::before { background: linear-gradient(90deg, var(--gold), var(--orange)); }
-  .venture-card.v-high::before { background: linear-gradient(90deg, var(--cyan), var(--blue)); }
-  .venture-card.v-med::before { background: linear-gradient(90deg, var(--purple), var(--blue)); }
-  .venture-name { font-size: 15px; font-weight: 700; }
-  .venture-score { float: right; font-size: 24px; font-weight: 900; font-family: 'JetBrains Mono', monospace; }
-  .venture-desc { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
-  .venture-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-  .v-tag { font-size: 9px; padding: 3px 8px; border-radius: 999px; background: var(--glass); border: 1px solid var(--border); color: var(--text-muted); }
+/* AGENTS TAB */
+.agents-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.agent-card{padding:16px;cursor:pointer;transition:all 0.3s;border:1px solid var(--glass-border)}
+.agent-card:hover{transform:translateY(-2px)}
+.agent-card .agent-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.agent-card .agent-name{font-weight:700;font-size:0.9rem;display:flex;align-items:center;gap:6px}
+.agent-card .agent-role{font-size:0.65rem;color:var(--text3)}
+.agent-card .status-dot{width:10px;height:10px;border-radius:50%}
+.agent-card .stat-row{display:flex;justify-content:space-between;font-size:0.7rem;color:var(--text2);margin:4px 0;font-family:var(--font-data)}
+.agent-card .progress{height:3px;background:var(--glass2);border-radius:2px;margin-top:8px;overflow:hidden}
+.agent-card .progress-fill{height:100%;border-radius:2px;transition:width 1s ease}
+.agent-card .details{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--glass-border);font-size:0.75rem;color:var(--text2)}
+.agent-card.expanded .details{display:block;animation:fadeUp 0.3s}
 
-  /* TRADING */
-  .trade-stat { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--border); }
-  .trade-stat:last-child { border: none; }
-  .trade-label { font-size: 12px; color: var(--text-muted); }
-  .trade-val { font-size: 16px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
-  .trade-val.positive { color: var(--green); }
-  .trade-val.negative { color: var(--red); }
+/* PIPELINE TAB */
+.pipeline-total{text-align:center;padding:16px;margin-bottom:12px}
+.pipeline-total .amount{font-size:2rem;font-weight:700;font-family:var(--font-data);color:var(--gold)}
+.pipeline-total .lbl{font-size:0.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:2px}
+.pipeline-section{margin-bottom:16px}
+.pipeline-section h3{font-size:0.8rem;font-family:var(--font-data);padding:8px 12px;border-radius:var(--radius-sm);margin-bottom:8px;letter-spacing:1px}
+.pipeline-section h3.auto{background:rgba(34,197,94,0.1);color:var(--green);border:1px solid rgba(34,197,94,0.2)}
+.pipeline-section h3.review{background:rgba(245,158,11,0.1);color:var(--orange);border:1px solid rgba(245,158,11,0.2)}
+.pipe-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-sm);margin-bottom:6px;cursor:pointer;transition:all 0.3s;background:var(--glass)}
+.pipe-row:hover{background:var(--glass2)}
+.score-ring{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-data);font-weight:700;font-size:0.85rem;position:relative;flex-shrink:0}
+.score-ring svg{position:absolute;inset:-2px;width:calc(100% + 4px);height:calc(100% + 4px);transform:rotate(-90deg)}
+.score-ring circle{fill:none;stroke-width:3;stroke-linecap:round}
+.pipe-info{flex:1}
+.pipe-name{font-weight:600;font-size:0.85rem}
+.pipe-cat{font-size:0.65rem;color:var(--text3)}
+.pipe-value{font-family:var(--font-data);font-size:0.8rem;color:var(--gold);text-align:right}
+.pipe-details{display:none;padding:8px 12px;font-size:0.75rem;color:var(--text2);background:var(--glass);border-radius:0 0 var(--radius-sm) var(--radius-sm);margin-top:-6px;margin-bottom:6px}
+.pipe-details.show{display:block;animation:fadeUp 0.3s}
 
-  /* FOOTER */
-  .footer { text-align: center; padding: 20px; font-size: 9px; color: var(--text-dim); letter-spacing: 1px; font-family: 'JetBrains Mono', monospace; }
+/* KANBAN */
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;overflow-x:auto}
+@media(max-width:768px){.kanban{grid-template-columns:repeat(4,minmax(200px,1fr))}}
+.kanban-col{background:var(--glass);border-radius:var(--radius);padding:10px;min-height:300px}
+.kanban-col h4{font-size:0.75rem;font-family:var(--font-data);color:var(--text2);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.kanban-col h4 .count{background:var(--glass2);padding:2px 8px;border-radius:10px;font-size:0.65rem}
+.k-card{padding:10px;border-radius:var(--radius-sm);background:var(--bg2);border-left:3px solid var(--cyan);margin-bottom:6px;cursor:grab;transition:all 0.2s;font-size:0.75rem}
+.k-card:active{cursor:grabbing;transform:scale(1.02);box-shadow:0 8px 30px rgba(0,0,0,0.4)}
+.k-card.high{border-left-color:var(--red)}
+.k-card.med{border-left-color:var(--orange)}
+.k-card.low{border-left-color:var(--green)}
+.k-card.done{border-left-color:var(--green);opacity:0.8}
+.k-card .title{font-weight:600;margin-bottom:4px}
+.k-card .meta{display:flex;justify-content:space-between;align-items:center;font-size:0.6rem;color:var(--text3)}
+.k-card .agent-pill{padding:1px 6px;border-radius:8px;font-size:0.55rem;font-family:var(--font-data)}
 
-  /* MOBILE BOTTOM NAV */
-  .mobile-nav {
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 150;
-    background: rgba(6,8,15,0.95); backdrop-filter: blur(20px);
-    border-top: 1px solid var(--border); display: flex; padding: 6px 0 env(safe-area-inset-bottom, 6px);
-  }
-  .mobile-nav-item {
-    flex: 1; text-align: center; padding: 8px 0; cursor: pointer; transition: color 0.2s;
-  }
-  .mobile-nav-item .nav-icon { font-size: 20px; }
-  .mobile-nav-item .nav-label { font-size: 9px; color: var(--text-dim); margin-top: 2px; font-weight: 600; letter-spacing: 0.5px; }
-  .mobile-nav-item.active .nav-label { color: var(--gold); }
-  .mobile-nav-item.active .nav-icon { filter: drop-shadow(0 0 6px var(--gold-glow)); }
-  
-  body { padding-bottom: 70px; }
+/* CALENDAR */
+.cal-header{display:flex;align-items:center;justify-content:space-between;padding:12px;margin-bottom:8px}
+.cal-header h3{font-family:var(--font-data);font-size:1rem;color:var(--gold)}
+.cal-nav{display:flex;gap:8px}
+.cal-nav button{background:var(--glass);border:1px solid var(--glass-border);color:var(--text);padding:6px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:0.8rem;transition:all 0.3s}
+.cal-nav button:hover{border-color:var(--gold)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-day-label{text-align:center;font-size:0.6rem;color:var(--text3);font-family:var(--font-data);padding:4px}
+.cal-cell{min-height:70px;padding:4px;border-radius:var(--radius-sm);background:var(--glass);font-family:var(--font-data);font-size:0.7rem;position:relative;transition:all 0.3s}
+.cal-cell.today{border:1px solid var(--gold);box-shadow:0 0 10px rgba(212,175,55,0.2)}
+.cal-cell.empty{background:transparent;border:none}
+.cal-cell .day-num{font-weight:600;margin-bottom:2px}
+.cal-event{padding:1px 4px;border-radius:4px;font-size:0.55rem;margin-bottom:2px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:all 0.2s}
+.cal-event:hover{transform:scale(1.02)}
+.cal-event.cron{background:rgba(0,229,255,0.15);color:var(--cyan)}
+.cal-event.task{background:rgba(212,175,55,0.15);color:var(--gold)}
+.cal-event.launch{background:rgba(239,68,68,0.15);color:var(--red)}
+.cal-event.review{background:rgba(168,85,247,0.15);color:var(--purple)}
 
-  /* RESPONSIVE */
-  @media (min-width: 768px) {
-    .kanban-scroll { flex-wrap: wrap; }
-    .kanban-col { min-width: 240px; flex: 1; }
-    .mobile-nav { display: none; }
-    body { padding-bottom: 20px; }
-    .agent-grid { grid-template-columns: repeat(4, 1fr); }
-  }
-  @media (min-width: 1200px) {
-    .content { max-width: 1200px; margin: 0 auto; }
-    .kanban-col { min-width: 260px; }
-  }
+/* COMMS */
+.comms-wrap{display:flex;flex-direction:column;height:calc(100vh - 300px);min-height:400px}
+.channel-filters{display:flex;gap:6px;padding:8px 0;flex-shrink:0}
+.ch-pill{padding:4px 12px;border-radius:20px;font-size:0.7rem;font-family:var(--font-data);cursor:pointer;border:1px solid var(--glass-border);background:var(--glass);color:var(--text2);transition:all 0.3s}
+.ch-pill.active{background:rgba(212,175,55,0.15);color:var(--gold);border-color:rgba(212,175,55,0.3)}
+.msg-list{flex:1;overflow-y:auto;padding:8px 0;scrollbar-width:thin}
+.msg-item{display:flex;align-items:flex-start;gap:10px;padding:10px;border-radius:var(--radius-sm);margin-bottom:4px;transition:background 0.2s}
+.msg-item:hover{background:var(--glass)}
+.msg-item .avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:var(--glass2);flex-shrink:0}
+.msg-item .msg-content{flex:1;min-width:0}
+.msg-item .msg-head{display:flex;justify-content:space-between;align-items:center}
+.msg-item .sender{font-weight:600;font-size:0.8rem}
+.msg-item .channel-tag{font-size:0.55rem;color:var(--text3);font-family:var(--font-data)}
+.msg-item .preview{font-size:0.75rem;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.msg-item .time{font-size:0.6rem;color:var(--text3);font-family:var(--font-data);flex-shrink:0}
+.msg-item .unread{width:8px;height:8px;border-radius:50%;background:var(--cyan);flex-shrink:0;margin-top:4px}
+.compose-bar{display:flex;gap:8px;padding:12px;border-top:1px solid var(--glass-border);flex-shrink:0;align-items:center}
+.compose-bar select{background:var(--bg2);border:1px solid var(--glass-border);color:var(--text);padding:8px;border-radius:var(--radius-sm);font-size:0.75rem;font-family:var(--font-data)}
+.compose-bar input{flex:1;background:var(--bg2);border:1px solid var(--glass-border);color:var(--text);padding:8px 12px;border-radius:var(--radius-sm);font-size:0.8rem;outline:none;transition:border-color 0.3s}
+.compose-bar input:focus{border-color:var(--gold)}
+.compose-bar .send-btn{background:linear-gradient(135deg,var(--gold),#b8941f);border:none;color:var(--bg);padding:8px 16px;border-radius:var(--radius-sm);cursor:pointer;font-weight:700;font-size:0.8rem;transition:all 0.3s}
+.compose-bar .send-btn:hover{transform:scale(1.05);box-shadow:0 0 15px rgba(212,175,55,0.3)}
+
+/* VENTURES */
+.ventures-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.venture-card{border-radius:var(--radius);background:var(--glass);border:1px solid var(--glass-border);overflow:hidden;transition:all 0.3s}
+.venture-card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,0.3)}
+.venture-card .top-bar{height:4px}
+.venture-card .body{padding:16px}
+.venture-card .score{font-size:2rem;font-weight:700;font-family:var(--font-data)}
+.venture-card .name{font-size:1rem;font-weight:600;margin:4px 0}
+.venture-card .desc{font-size:0.75rem;color:var(--text2)}
+.venture-card .tags{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.venture-card .tag{padding:2px 8px;border-radius:10px;font-size:0.6rem;font-family:var(--font-data)}
+.venture-card .prog{height:4px;background:var(--glass2);border-radius:2px;margin-top:10px;overflow:hidden}
+.venture-card .prog-fill{height:100%;border-radius:2px;transition:width 1.5s ease}
+
+/* TRADING */
+.trading-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.trade-card{padding:16px}
+.trade-card h4{font-family:var(--font-data);font-size:0.8rem;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
+.trade-stat{display:flex;justify-content:space-between;padding:4px 0;font-size:0.8rem}
+.trade-stat .k{color:var(--text3)}
+.trade-stat .v{font-family:var(--font-data);font-weight:600}
+.acct-card{text-align:center;padding:20px}
+.acct-card .bal{font-size:1.8rem;font-weight:700;font-family:var(--font-data)}
+.acct-card .type{font-size:0.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:2px}
+.session-timer{font-family:var(--font-data);text-align:center;padding:10px;margin:4px 0;border-radius:var(--radius-sm);background:var(--glass)}
+.session-timer .name{font-size:0.7rem;color:var(--text3)}
+.session-timer .countdown{font-size:1.2rem;font-weight:700;color:var(--cyan)}
+
+/* CONSOLE */
+.console-wrap{background:#000;border-radius:var(--radius);border:1px solid rgba(0,229,255,0.1);height:calc(100vh - 300px);min-height:400px;display:flex;flex-direction:column;font-family:var(--font-data)}
+.console-output{flex:1;overflow-y:auto;padding:12px;font-size:0.75rem;line-height:1.6;color:var(--cyan);scrollbar-width:thin}
+.console-output .cmd-line{color:var(--green)}
+.console-output .res-line{color:var(--cyan);opacity:0.8}
+.console-output .err-line{color:var(--red)}
+.console-output .sys-line{color:var(--gold)}
+.console-input{display:flex;align-items:center;padding:8px 12px;border-top:1px solid rgba(0,229,255,0.1)}
+.console-input .prompt{color:var(--green);margin-right:8px;white-space:nowrap;font-size:0.75rem}
+.console-input input{flex:1;background:transparent;border:none;color:var(--cyan);font-family:var(--font-data);font-size:0.75rem;outline:none;caret-color:var(--cyan)}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:rgba(6,8,15,0.95);border-top:1px solid var(--glass-border);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:100;padding:4px 0;padding-bottom:env(safe-area-inset-bottom,4px)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:none;background:transparent;color:var(--text3);cursor:pointer;font-size:0.6rem;font-family:var(--font-data);transition:all 0.3s}
+.nav-btn.active{color:var(--gold)}
+.nav-btn .nav-icon{font-size:1.2rem}
+.nav-btn .nav-indicator{width:20px;height:2px;border-radius:1px;background:transparent;transition:all 0.3s}
+.nav-btn.active .nav-indicator{background:var(--gold)}
+
+/* MORE MENU */
+.more-menu{display:none;position:fixed;bottom:60px;right:8px;z-index:101;padding:8px;min-width:160px}
+.more-menu.show{display:block;animation:fadeUp 0.2s}
+.more-menu-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:0.75rem;transition:background 0.2s}
+.more-menu-item:hover{background:var(--glass2)}
+
+/* FOOTER */
+.footer{text-align:center;padding:16px;font-size:0.6rem;color:var(--text3);font-family:var(--font-data);letter-spacing:1px}
+.footer .doctrine{color:var(--gold);margin-bottom:4px;font-weight:600}
+
+/* EVENT POPUP */
+.event-popup{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1000;padding:20px;width:85%;max-width:350px}
+.event-popup.show{display:block;animation:fadeUp 0.3s}
+.event-popup h4{color:var(--gold);margin-bottom:8px}
+.event-popup p{font-size:0.8rem;color:var(--text2)}
+.event-popup .close-btn{margin-top:12px;padding:6px 16px;background:var(--glass2);border:1px solid var(--glass-border);color:var(--text);border-radius:var(--radius-sm);cursor:pointer}
+
+/* QA FEEDBACK */
+.qa-feedback{position:fixed;top:20%;left:50%;transform:translate(-50%,-50%);z-index:1000;padding:12px 24px;border-radius:var(--radius);font-family:var(--font-data);font-size:0.85rem;animation:fadeUp 0.3s;pointer-events:none}
+.qa-feedback.show{display:block}
+
+@media(min-width:1200px){
+  .app{max-width:1400px;margin:0 auto}
+}
 </style>
 </head>
 <body>
-
-<!-- HEADER -->
-<div class="header">
-  <div class="header-top">
-    <div class="header-brand">
-      <span class="crown">👑</span>
-      <div>
-        <h1>NEXUS COMMAND</h1>
-        <div class="sub">ZJK CAPITAL · NTIC v11</div>
+<div class="app">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <h1>👑 NEXUS THRONE INTELLIGENCE CAPITAL</h1>
+      <p>Sovereign Intelligence Infrastructure</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="status-pill operational" onclick="toggleStatusPopup()">
+        <span class="dot"></span><span id="sys-status">OPERATIONAL</span>
       </div>
     </div>
-    <div class="header-status">
-      <span class="status-pip pip-on"></span>
-      <span class="status-text" id="clock">--:--</span>
+    <div class="header-right">
+      <span class="clock" id="live-clock">00:00:00</span>
+      <span class="mode-badge">Autonomous</span>
+      <span class="heartbeat" title="System Heartbeat"></span>
     </div>
+    <div class="header-sub">Production Mode · 7 Agents · 3 Channels · Autonomous</div>
+  </header>
+
+  <!-- STATUS POPUP -->
+  <div class="overlay" id="overlay" onclick="toggleStatusPopup()"></div>
+  <div class="status-popup glass" id="statusPopup">
+    <h3>⚡ System Services</h3>
+    <div id="svc-list"></div>
+    <button onclick="toggleStatusPopup()" style="margin-top:12px;padding:6px 16px;background:var(--glass2);border:1px solid var(--glass-border);color:var(--text);border-radius:var(--radius-sm);cursor:pointer">Close</button>
   </div>
-</div>
 
-<!-- METRICS -->
-<div class="metrics-bar">
-  <div class="metric-mini"><div class="val">$0</div><div class="lbl">MRR</div></div>
-  <div class="metric-mini"><div class="val">5</div><div class="lbl">Pipeline</div></div>
-  <div class="metric-mini"><div class="val">3</div><div class="lbl">Approved</div></div>
-  <div class="metric-mini"><div class="val">31</div><div class="lbl">Files</div></div>
-</div>
+  <!-- KPI ROW -->
+  <div class="kpi-row" id="kpi-row"></div>
 
-<!-- NAV -->
-<div class="nav-tabs" id="navTabs">
-  <div class="nav-tab active" data-panel="kanban">⬜ Board</div>
-  <div class="nav-tab" data-panel="pipeline">📊 Pipeline</div>
-  <div class="nav-tab" data-panel="agents">🤖 Agents</div>
-  <div class="nav-tab" data-panel="calendar">📅 Calendar</div>
-  <div class="nav-tab" data-panel="comms">💬 Comms</div>
-  <div class="nav-tab" data-panel="ventures">🏗️ Ventures</div>
-  <div class="nav-tab" data-panel="trading">📈 Trading</div>
-</div>
+  <!-- ALERTS -->
+  <div class="alert-strip" id="alert-strip">
+    <div class="alert-track" id="alert-track"></div>
+  </div>
 
-<!-- KANBAN -->
-<div class="content">
-<div id="kanban" class="panel active">
-  <div class="kanban-scroll">
-    <div class="kanban-col col-queue">
-      <div class="kanban-header">Queue <span class="cnt">4</span></div>
-      <div class="task-card priority-med"><div class="title">Set up Twilio for AI Receptionist</div><div class="meta"><span class="agent-tag tag-forge">FORGE</span><span class="time">Blocked</span></div></div>
-      <div class="task-card priority-low"><div class="title">AI Workforce Builder Modules 2-6</div><div class="meta"><span class="agent-tag tag-prophet">PROPHET</span><span class="time">Queued</span></div></div>
-      <div class="task-card priority-low"><div class="title">WealthThrone v2 Launch</div><div class="meta"><span class="agent-tag tag-nexus">NEXUS</span><span class="time">Planned</span></div></div>
-      <div class="task-card priority-low"><div class="title">Clip Army OAuth Tokens</div><div class="meta"><span class="agent-tag tag-vision">VISION</span><span class="time">Blocked</span></div></div>
+  <!-- TAB BAR -->
+  <div class="tab-bar" id="tab-bar"></div>
+
+  <!-- TAB CONTENT -->
+  <div class="tab-content">
+    <!-- COMMAND -->
+    <div class="tab-panel active" id="panel-command">
+      <div class="cmd-layout">
+        <div>
+          <div class="glass war-room" id="war-room"></div>
+          <div class="services-grid" id="svc-grid" style="margin-top:12px"></div>
+        </div>
+        <div class="quick-actions" id="quick-actions"></div>
+      </div>
     </div>
-    <div class="kanban-col col-active">
-      <div class="kanban-header" style="color:var(--cyan)">Active <span class="cnt">4</span></div>
-      <div class="task-card priority-high"><div class="title">Sniper Engine MES Build</div><div class="meta"><span class="agent-tag tag-oracle">ORACLE</span><span class="time">Building</span></div></div>
-      <div class="task-card priority-high"><div class="title">FutureMind Kids App</div><div class="meta"><span class="agent-tag tag-forge">FORGE</span><span class="time">Building</span></div></div>
-      <div class="task-card priority-high"><div class="title">WRAITH Digital Recon</div><div class="meta"><span class="agent-tag tag-wraith">WRAITH</span><span class="time">Scanning</span></div></div>
-      <div class="task-card priority-med"><div class="title">Mission Control v2</div><div class="meta"><span class="agent-tag tag-nexus">NEXUS</span><span class="time">Active</span></div></div>
-    </div>
-    <div class="kanban-col col-review">
-      <div class="kanban-header" style="color:var(--orange)">Review <span class="cnt">2</span></div>
-      <div class="task-card priority-med"><div class="title">Voice Content Service</div><div class="meta"><span class="agent-tag tag-prophet">PROPHET</span><span class="time">Score: 78</span></div></div>
-      <div class="task-card priority-med"><div class="title">Local Business AI Front Desk</div><div class="meta"><span class="agent-tag tag-herald">HERALD</span><span class="time">Score: 76</span></div></div>
-    </div>
-    <div class="kanban-col col-done">
-      <div class="kanban-header" style="color:var(--green)">Done <span class="cnt">12</span></div>
-      <div class="task-card" style="border-left:3px solid var(--green)"><div class="title">✓ Blueprint v11</div><div class="meta"><span class="agent-tag tag-nexus">NEXUS</span><span class="time">1,031 lines</span></div></div>
-      <div class="task-card" style="border-left:3px solid var(--green)"><div class="title">✓ Telegram + Discord Live</div><div class="meta"><span class="agent-tag tag-vision">VISION</span><span class="time">Connected</span></div></div>
-      <div class="task-card" style="border-left:3px solid var(--green)"><div class="title">✓ Brave Search Configured</div><div class="meta"><span class="agent-tag tag-wraith">WRAITH</span><span class="time">Hunting</span></div></div>
-      <div class="task-card" style="border-left:3px solid var(--green)"><div class="title">✓ AI Consulting Offer</div><div class="meta"><span class="agent-tag tag-forge">FORGE</span><span class="time">Ready</span></div></div>
-      <div class="task-card" style="border-left:3px solid var(--green)"><div class="title">✓ DP6 Sample Digest</div><div class="meta"><span class="agent-tag tag-prophet">PROPHET</span><span class="time">Ready</span></div></div>
-      <div class="task-card" style="border-left:3px solid var(--green)"><div class="title">✓ Case Study + Outreach</div><div class="meta"><span class="agent-tag tag-herald">HERALD</span><span class="time">4 posts</span></div></div>
-      <div class="task-card" style="border-left:3px solid var(--green)"><div class="title">✓ TopstepX Authenticated</div><div class="meta"><span class="agent-tag tag-oracle">ORACLE</span><span class="time">Live</span></div></div>
-      <div class="task-card" style="border-left:3px solid var(--green)"><div class="title">✓ FutureMind Blueprint</div><div class="meta"><span class="agent-tag tag-nexus">NEXUS</span><span class="time">448 lines</span></div></div>
-    </div>
+    <!-- AGENTS -->
+    <div class="tab-panel" id="panel-agents"><div class="agents-grid" id="agents-grid"></div></div>
+    <!-- PIPELINE -->
+    <div class="tab-panel" id="panel-pipeline"><div id="pipeline-content"></div></div>
+    <!-- KANBAN -->
+    <div class="tab-panel" id="panel-kanban"><div class="kanban" id="kanban"></div></div>
+    <!-- CALENDAR -->
+    <div class="tab-panel" id="panel-calendar"><div id="calendar-content"></div></div>
+    <!-- COMMS -->
+    <div class="tab-panel" id="panel-comms"><div class="comms-wrap" id="comms-wrap"></div></div>
+    <!-- VENTURES -->
+    <div class="tab-panel" id="panel-ventures"><div class="ventures-grid" id="ventures-grid"></div></div>
+    <!-- TRADING -->
+    <div class="tab-panel" id="panel-trading"><div class="trading-grid" id="trading-grid"></div></div>
+    <!-- CONSOLE -->
+    <div class="tab-panel" id="panel-console"><div class="console-wrap"><div class="console-output" id="console-output"></div><div class="console-input"><span class="prompt">nexus@throne:~$</span><input type="text" id="console-in" autocomplete="off" spellcheck="false" placeholder="Type a command..."></div></div></div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="doctrine">THE THRONE IS SOVEREIGN · THE FLYWHEEL SPINS · THE THRONE DOESN'T SLEEP</div>
+    <div id="footer-time"></div>
+    <div>NTIC v11 · Blueprint 1,031 lines</div>
   </div>
 </div>
 
-<!-- PIPELINE -->
-<div id="pipeline" class="panel">
-  <div class="section-label"><span class="dot"></span> AUTO-APPROVED (85+)</div>
-  <div class="pipe-row"><div class="pipe-info"><div class="pipe-name">AI System Consulting</div><div class="pipe-cat">AI Automation · Assets Built</div></div><div class="pipe-score"><div class="score-ring ring-high">92</div><div class="pipe-value">$5-15K/mo</div></div></div>
-  <div class="pipe-row"><div class="pipe-info"><div class="pipe-name">AI Workforce Course</div><div class="pipe-cat">Content/Creator · Production Next</div></div><div class="pipe-score"><div class="score-ring ring-high">89</div><div class="pipe-value">$2.5-5K/mo</div></div></div>
-  <div class="pipe-row"><div class="pipe-info"><div class="pipe-name">DP6 Intelligence Membership</div><div class="pipe-cat">Intelligence · Sample Built</div></div><div class="pipe-score"><div class="score-ring ring-high">88</div><div class="pipe-value">$3-9K/mo</div></div></div>
-  <div class="section-label" style="margin-top:20px"><span class="dot" style="background:var(--orange)"></span> OPERATOR REVIEW (70-84)</div>
-  <div class="pipe-row"><div class="pipe-info"><div class="pipe-name">Voice Content Service</div><div class="pipe-cat">Content/Creator · ElevenLabs Ready</div></div><div class="pipe-score"><div class="score-ring ring-med">78</div><div class="pipe-value">$1-3K/mo</div></div></div>
-  <div class="pipe-row"><div class="pipe-info"><div class="pipe-name">Local Business AI Front Desk</div><div class="pipe-cat">Local Services · Needs Twilio</div></div><div class="pipe-score"><div class="score-ring ring-med">76</div><div class="pipe-value">$3-10K/mo</div></div></div>
+<!-- EVENT POPUP -->
+<div class="overlay" id="evt-overlay" onclick="closeEvtPopup()" style="display:none"></div>
+<div class="event-popup glass" id="evt-popup">
+  <h4 id="evt-title"></h4>
+  <p id="evt-desc"></p>
+  <button class="close-btn" onclick="closeEvtPopup()">Close</button>
 </div>
 
-<!-- AGENTS -->
-<div id="agents" class="panel">
-  <div class="agent-grid">
-    <div class="agent-card"><div class="agent-icon">👑</div><div class="agent-name">HALO</div><div class="agent-role">Command Hub</div><div class="agent-status"><span class="dot" style="background:var(--green)"></span> Autonomous</div></div>
-    <div class="agent-card"><div class="agent-icon">🔮</div><div class="agent-name">ORACLE</div><div class="agent-role">Decision Intel</div><div class="agent-status"><span class="dot" style="background:var(--green)"></span> 5 Scored</div></div>
-    <div class="agent-card"><div class="agent-icon">👻</div><div class="agent-name">WRAITH</div><div class="agent-role">Recon Hunter</div><div class="agent-status"><span class="dot" style="background:var(--green)"></span> Hunting</div></div>
-    <div class="agent-card"><div class="agent-icon">👁️</div><div class="agent-name">VISION</div><div class="agent-role">System Guard</div><div class="agent-status"><span class="dot" style="background:var(--green)"></span> Clean</div></div>
-    <div class="agent-card"><div class="agent-icon">⚡</div><div class="agent-name">PROPHET</div><div class="agent-role">Content + Predict</div><div class="agent-status"><span class="dot" style="background:var(--cyan)"></span> Building</div></div>
-    <div class="agent-card"><div class="agent-icon">⚖️</div><div class="agent-name">LEGIS</div><div class="agent-role">Compliance</div><div class="agent-status"><span class="dot" style="background:var(--text-dim)"></span> Standby</div></div>
-    <div class="agent-card"><div class="agent-icon">🏛️</div><div class="agent-name">NEXUS</div><div class="agent-role">Strategic Cmd</div><div class="agent-status"><span class="dot" style="background:var(--green)"></span> Active</div></div>
-  </div>
-</div>
+<!-- QA FEEDBACK -->
+<div id="qa-feedback" class="glass" style="display:none;position:fixed;top:20%;left:50%;transform:translate(-50%,-50%);z-index:1000;padding:12px 24px;font-family:var(--font-data);font-size:0.85rem"></div>
 
-<!-- CALENDAR -->
-<div id="calendar" class="panel">
-  <div class="glass glass-gold" style="margin-bottom:16px">
-    <div style="font-size:18px;font-weight:700;">March 2026</div>
-    <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Week of March 17-23</div>
-  </div>
-  <div class="cal-week">
-    <div class="cal-day-hdr">M</div><div class="cal-day-hdr">T</div><div class="cal-day-hdr">W</div><div class="cal-day-hdr">T</div><div class="cal-day-hdr">F</div><div class="cal-day-hdr">S</div><div class="cal-day-hdr">S</div>
-    <div class="cal-cell"><div class="cal-num">17</div><div class="cal-evt evt-cron">ORACLE 7a</div></div>
-    <div class="cal-cell"><div class="cal-num">18</div><div class="cal-evt evt-cron">HALO 7:30a</div></div>
-    <div class="cal-cell today"><div class="cal-num">19</div><div class="cal-evt evt-launch">🚀 NTIC LIVE</div><div class="cal-evt evt-task">Sniper Build</div><div class="cal-evt evt-task">FutureMind</div></div>
-    <div class="cal-cell"><div class="cal-num">20</div><div class="cal-evt evt-task">LinkedIn Post</div><div class="cal-evt evt-task">50 Targets</div></div>
-    <div class="cal-cell"><div class="cal-num">21</div><div class="cal-evt evt-task">Module 1</div></div>
-    <div class="cal-cell"><div class="cal-num">22</div><div class="cal-evt evt-task">DP6 Launch</div></div>
-    <div class="cal-cell"><div class="cal-num">23</div><div class="cal-evt evt-review">Weekly Review</div></div>
-  </div>
-  <div class="cal-week">
-    <div class="cal-cell"><div class="cal-num">24</div><div class="cal-evt evt-task">Outreach #1</div></div>
-    <div class="cal-cell"><div class="cal-num">25</div><div class="cal-evt evt-launch">First Demo</div></div>
-    <div class="cal-cell"><div class="cal-num">26</div><div class="cal-evt evt-task">DP6 Issue 1</div></div>
-    <div class="cal-cell"><div class="cal-num">27</div><div class="cal-evt evt-task">Module 2</div></div>
-    <div class="cal-cell"><div class="cal-num">28</div><div class="cal-evt evt-launch">First Close</div></div>
-    <div class="cal-cell"><div class="cal-num">29</div></div>
-    <div class="cal-cell"><div class="cal-num">30</div><div class="cal-evt evt-review">Month Review</div></div>
-  </div>
-</div>
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav" id="bottom-nav"></nav>
 
-<!-- COMMS -->
-<div id="comms" class="panel">
-  <div class="channel-pills">
-    <div class="channel-pill active">All</div>
-    <div class="channel-pill">📱 Telegram</div>
-    <div class="channel-pill">💬 Discord</div>
-    <div class="channel-pill">🤖 System</div>
-  </div>
-  <div class="msg-list">
-    <div class="msg-item"><div class="msg-avatar av-sys">👑</div><div class="msg-body"><div class="msg-from">NEXUS</div><div class="msg-preview">NTIC System fully operational. All channels connected.</div><div class="msg-time">04:04 ET</div></div></div>
-    <div class="msg-item"><div class="msg-avatar av-tg">📱</div><div class="msg-body"><div class="msg-from">Telegram · James</div><div class="msg-preview">build it add whatever else you think is needed</div><div class="msg-time">04:04 ET</div></div></div>
-    <div class="msg-item"><div class="msg-avatar av-sys">🔮</div><div class="msg-body"><div class="msg-from">ORACLE</div><div class="msg-preview">TopstepX authenticated. 4 tradeable accounts found.</div><div class="msg-time">03:28 ET</div></div></div>
-    <div class="msg-item"><div class="msg-avatar av-sys">👻</div><div class="msg-body"><div class="msg-from">WRAITH</div><div class="msg-preview">Brave Search live. First recon: HVAC Charlotte — 5 targets.</div><div class="msg-time">02:49 ET</div></div></div>
-    <div class="msg-item"><div class="msg-avatar av-dc">💬</div><div class="msg-body"><div class="msg-from">Discord · #mission-control</div><div class="msg-preview">NTIC SYSTEM ONLINE. All channels operational.</div><div class="msg-time">02:48 ET</div></div></div>
-    <div class="msg-item"><div class="msg-avatar av-sys">⚡</div><div class="msg-body"><div class="msg-from">PROPHET</div><div class="msg-preview">DP6 Sample Digest built. LinkedIn posts ready to deploy.</div><div class="msg-time">02:42 ET</div></div></div>
-    <div class="msg-item"><div class="msg-avatar av-tg">📱</div><div class="msg-body"><div class="msg-from">Telegram · James</div><div class="msg-preview">so were up and running</div><div class="msg-time">02:49 ET</div></div></div>
-    <div class="msg-item"><div class="msg-avatar av-sys">👁️</div><div class="msg-body"><div class="msg-from">VISION</div><div class="msg-preview">Discord gateway fixed. All 3 channels green.</div><div class="msg-time">02:33 ET</div></div></div>
-  </div>
-</div>
-
-<!-- VENTURES -->
-<div id="ventures" class="panel">
-  <div class="venture-card v-alpha"><div class="venture-score" style="color:var(--gold)">94</div><div class="venture-name">WealthThrone</div><div class="venture-desc">Community Wealth Intelligence Platform — CATEGORY ALPHA</div><div class="venture-tags"><div class="v-tag">Platform</div><div class="v-tag">All Agents</div><div class="v-tag">GHL Killer</div></div></div>
-  <div class="venture-card v-high"><div class="venture-score" style="color:var(--cyan)">91</div><div class="venture-name">DP6</div><div class="venture-desc">$297/month intelligence membership — monetize what NTIC already produces</div><div class="venture-tags"><div class="v-tag">Subscription</div><div class="v-tag">Content</div><div class="v-tag">Ready</div></div></div>
-  <div class="venture-card v-high"><div class="venture-score" style="color:var(--cyan)">89</div><div class="venture-name">FutureMind Kids</div><div class="venture-desc">AI-powered digital school ecosystem — the greatest kids app ever built</div><div class="venture-tags"><div class="v-tag">EdTech</div><div class="v-tag">Building</div><div class="v-tag">Global Mission</div></div></div>
-  <div class="venture-card v-med"><div class="venture-score" style="color:var(--purple)">87</div><div class="venture-name">AgentMarket</div><div class="venture-desc">AI Workforce Marketplace — 15% commission + $297/month operator listing</div><div class="venture-tags"><div class="v-tag">Marketplace</div><div class="v-tag">Queued</div></div></div>
-  <div class="venture-card v-med"><div class="venture-score" style="color:var(--purple)">86</div><div class="venture-name">CarolinaSignal</div><div class="venture-desc">Eastern NC Intelligence Network — cultural context Silicon Valley can't buy</div><div class="venture-tags"><div class="v-tag">Local Intel</div><div class="v-tag">$97-497/mo</div></div></div>
-</div>
-
-<!-- TRADING -->
-<div id="trading" class="panel">
-  <div class="glass glass-cyan">
-    <div style="font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:1px;margin-bottom:12px;">SNIPER ENGINE · MES</div>
-    <div class="trade-stat"><span class="trade-label">Status</span><span class="trade-val" style="color:var(--orange)">BUILDING</span></div>
-    <div class="trade-stat"><span class="trade-label">Mode</span><span class="trade-val" style="color:var(--text)">SIGNAL ONLY</span></div>
-    <div class="trade-stat"><span class="trade-label">Daily Target</span><span class="trade-val">$500</span></div>
-    <div class="trade-stat"><span class="trade-label">Max Contracts</span><span class="trade-val">2 MES</span></div>
-    <div class="trade-stat"><span class="trade-label">Daily Loss Limit</span><span class="trade-val negative">-$250</span></div>
-  </div>
-  <div class="section-label" style="margin-top:16px"><span class="dot" style="background:var(--cyan)"></span> ACCOUNTS</div>
-  <div class="glass">
-    <div class="trade-stat"><span class="trade-label">Funded (Express)</span><span class="trade-val positive">$285.05</span></div>
-    <div class="trade-stat"><span class="trade-label">New Combine (50K)</span><span class="trade-val positive">$50,000.00</span></div>
-    <div class="trade-stat"><span class="trade-label">Practice</span><span class="trade-val">$162,173.77</span></div>
-  </div>
-  <div class="section-label"><span class="dot" style="background:var(--cyan)"></span> NEXT SESSION</div>
-  <div class="glass">
-    <div class="trade-stat"><span class="trade-label">Pre-Market Bias</span><span class="trade-val" style="color:var(--text-muted)">07:00 ET</span></div>
-    <div class="trade-stat"><span class="trade-label">NY Open Kill Zone</span><span class="trade-val" style="color:var(--cyan)">09:30 - 11:00 ET</span></div>
-    <div class="trade-stat"><span class="trade-label">NY PM Session</span><span class="trade-val" style="color:var(--cyan)">13:30 - 15:30 ET</span></div>
-  </div>
-</div>
-</div>
-
-<!-- MOBILE BOTTOM NAV -->
-<div class="mobile-nav" id="mobileNav">
-  <div class="mobile-nav-item active" data-panel="kanban"><div class="nav-icon">⬜</div><div class="nav-label">Board</div></div>
-  <div class="mobile-nav-item" data-panel="pipeline"><div class="nav-icon">📊</div><div class="nav-label">Pipeline</div></div>
-  <div class="mobile-nav-item" data-panel="comms"><div class="nav-icon">💬</div><div class="nav-label">Comms</div></div>
-  <div class="mobile-nav-item" data-panel="ventures"><div class="nav-icon">🏗️</div><div class="nav-label">Ventures</div></div>
-  <div class="mobile-nav-item" data-panel="trading"><div class="nav-icon">📈</div><div class="nav-label">Trading</div></div>
-</div>
-
-<div class="footer">
-  NEXUS COMMAND CENTER · NTIC v11 · <span id="footerTime"></span><br>
-  THE THRONE IS SOVEREIGN · THE FLYWHEEL SPINS · THE THRONE DOESN'T SLEEP
-</div>
+<!-- MORE MENU -->
+<div class="more-menu glass" id="more-menu"></div>
 
 <script>
-// Tab switching
-function switchPanel(panel) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab, .mobile-nav-item').forEach(t => t.classList.remove('active'));
-  document.getElementById(panel)?.classList.add('active');
-  document.querySelectorAll(`[data-panel="${panel}"]`).forEach(t => t.classList.add('active'));
-}
-document.querySelectorAll('.nav-tab, .mobile-nav-item').forEach(tab => {
-  tab.addEventListener('click', () => switchPanel(tab.dataset.panel));
-});
+// ============ DATA ============
+const TABS = [
+  {id:'command',label:'Command',icon:'⚔️'},
+  {id:'agents',label:'Agents',icon:'🤖'},
+  {id:'pipeline',label:'Pipeline',icon:'📊'},
+  {id:'kanban',label:'Kanban',icon:'📋'},
+  {id:'calendar',label:'Calendar',icon:'📅'},
+  {id:'comms',label:'Comms',icon:'💬'},
+  {id:'ventures',label:'Ventures',icon:'🚀'},
+  {id:'trading',label:'Trading',icon:'📈'},
+  {id:'console',label:'Console',icon:'⌨️'}
+];
 
-// Clock
-function updateClock() {
-  const now = new Date().toLocaleString('en-US', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-  document.getElementById('clock').textContent = now + ' ET';
-  const full = new Date().toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-  document.getElementById('footerTime').textContent = full;
-}
-updateClock();
-setInterval(updateClock, 1000);
+const SERVICES = [
+  {name:'PostgreSQL',status:'healthy',color:'var(--green)'},
+  {name:'Scheduler',status:'online',color:'var(--green)'},
+  {name:'Gateway',status:'running',color:'var(--green)'},
+  {name:'Discord',status:'connected',color:'var(--green)'},
+  {name:'Telegram',status:'connected',color:'var(--green)'},
+  {name:'Brave Search',status:'active',color:'var(--green)'},
+  {name:'ElevenLabs',status:'configured',color:'var(--cyan)'},
+  {name:'TopstepX',status:'authenticated',color:'var(--cyan)'}
+];
 
-// Channel filter
-document.querySelectorAll('.channel-pill').forEach(pill => {
-  pill.addEventListener('click', () => {
-    document.querySelectorAll('.channel-pill').forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
+const AGENTS = [
+  {id:'halo',name:'HALO',icon:'👑',role:'Command Hub',color:'var(--gold)',status:'active',lastAction:'Coordinated morning brief',queue:3,scored:null,targets:null,health:null,content:null,directives:null,details:'Primary command and control agent. Orchestrates all other agents, manages task queue, and coordinates multi-agent workflows.'},
+  {id:'oracle',name:'ORACLE',icon:'🔮',role:'Decision Intel',color:'var(--purple)',status:'active',lastAction:'Scored 5 opportunities',queue:2,scored:47,targets:null,health:null,content:null,directives:null,details:'Evaluates and scores opportunities using multi-factor analysis. Auto-approves scores >85, flags for review 70-85.'},
+  {id:'wraith',name:'WRAITH',icon:'👻',role:'Recon Hunter',color:'var(--cyan)',status:'active',lastAction:'Scanning Charlotte HVAC',queue:1,scored:null,targets:23,health:null,content:null,directives:null,details:'Lead generation engine. Scrapes, filters, and qualifies business targets. Currently running local business vertical.'},
+  {id:'vision',name:'VISION',icon:'👁️',role:'System Guard',color:'var(--green)',status:'active',lastAction:'Health check passed',queue:0,scored:null,targets:null,health:'All Green',content:null,directives:null,details:'Monitors system health, service connectivity, and security posture. Alerts on anomalies.'},
+  {id:'prophet',name:'PROPHET',icon:'⚡',role:'Content Engine',color:'var(--orange)',status:'active',lastAction:'Generated 3 posts',queue:4,scored:null,targets:null,health:null,content:12,directives:null,details:'Content generation and distribution. Creates posts, articles, and marketing materials across channels.'},
+  {id:'legis',name:'LEGIS',icon:'⚖️',role:'Compliance',color:'var(--text3)',status:'standby',lastAction:'Standing by',queue:0,scored:null,targets:null,health:null,content:null,directives:null,details:'Legal and compliance oversight. Reviews contracts, ensures regulatory compliance, and manages risk.'},
+  {id:'nexus',name:'NEXUS',icon:'🏛️',role:'Strategic Command',color:'var(--gold)',status:'active',lastAction:'Updated directives',queue:1,scored:null,targets:null,health:null,content:null,directives:14,details:'Strategic governance layer. Sets priorities, manages resource allocation, and maintains system doctrine.'}
+];
+
+const ALERTS_DATA = [
+  {text:'⚡ Sniper Engine: Building Phase 2',type:'warning'},
+  {text:'🧒 FutureMind Kids: Development Sprint',type:'info'},
+  {text:'📊 Premarket Bias: 07:00 ET',type:'info'},
+  {text:'✅ WRAITH: 23 targets qualified today',type:'success'},
+  {text:'🔮 ORACLE: 5 new scores ready',type:'success'},
+  {text:'⚠️ Revenue: MRR still at $0 — execution priority',type:'critical'},
+  {text:'🚀 DP6 Membership: Launch imminent',type:'info'},
+  {text:'👑 WealthThrone: Score 94 — Category Alpha',type:'success'}
+];
+
+const FEED_DATA = [
+  {agent:'👻',name:'WRAITH',msg:'Discovered 5 HVAC targets in Charlotte',badge:'success',color:'var(--cyan)'},
+  {agent:'🔮',name:'ORACLE',msg:'Scored 5 opportunities (3 auto-approved)',badge:'success',color:'var(--purple)'},
+  {agent:'👑',name:'HALO',msg:'Morning coordination complete — all agents synced',badge:'active',color:'var(--gold)'},
+  {agent:'👁️',name:'VISION',msg:'All channels operational — health check passed',badge:'success',color:'var(--green)'},
+  {agent:'⚡',name:'PROPHET',msg:'Generated 3 LinkedIn posts for WealthThrone',badge:'active',color:'var(--orange)'},
+  {agent:'🏛️',name:'NEXUS',msg:'Strategic directives updated — revenue priority',badge:'active',color:'var(--gold)'},
+  {agent:'👻',name:'WRAITH',msg:'Scanning plumber + electrician verticals',badge:'pending',color:'var(--cyan)'},
+  {agent:'🔮',name:'ORACLE',msg:'AI Consulting scored 92 — auto-approved',badge:'success',color:'var(--purple)'},
+  {agent:'⚡',name:'PROPHET',msg:'Content calendar updated for week 12',badge:'active',color:'var(--orange)'},
+  {agent:'👁️',name:'VISION',msg:'Discord webhook latency normal (230ms)',badge:'success',color:'var(--green)'}
+];
+
+const PIPELINE = {
+  auto:[
+    {name:'AI System Consulting',cat:'AI Services',score:92,min:5000,max:15000,desc:'Full-stack AI automation consulting for SMBs. Includes agent deployment, workflow design, and ongoing optimization.'},
+    {name:'AI Workforce Course',cat:'Education',score:89,min:2500,max:5000,desc:'Online course teaching businesses to build AI workforces. Video + community + templates.'},
+    {name:'DP6 Membership',cat:'Community',score:88,min:3000,max:9000,desc:'Premium membership community for AI-forward entrepreneurs. Weekly calls, resources, networking.'}
+  ],
+  review:[
+    {name:'Voice Content',cat:'Content',score:78,min:1000,max:3000,desc:'AI-generated voice content and podcasts. Uses ElevenLabs for production.'},
+    {name:'Local Business AI',cat:'Lead Gen',score:76,min:3000,max:10000,desc:'Done-for-you AI setup for local businesses (HVAC, plumbing, electrical). White-glove service.'}
+  ]
+};
+
+const KANBAN_DATA = {
+  queue:[
+    {title:'Build Sniper Engine v2',agent:'NEXUS',agentColor:'var(--gold)',priority:'high',time:'2h ago'},
+    {title:'FutureMind curriculum outline',agent:'PROPHET',agentColor:'var(--orange)',priority:'med',time:'3h ago'},
+    {title:'Setup Stripe live keys',agent:'HALO',agentColor:'var(--gold)',priority:'high',time:'1h ago'}
+  ],
+  active:[
+    {title:'WRAITH Charlotte scan',agent:'WRAITH',agentColor:'var(--cyan)',priority:'high',time:'30m ago'},
+    {title:'ORACLE scoring pipeline',agent:'ORACLE',agentColor:'var(--purple)',priority:'med',time:'45m ago'},
+    {title:'DP6 landing page',agent:'PROPHET',agentColor:'var(--orange)',priority:'med',time:'1h ago'}
+  ],
+  review:[
+    {title:'AI Consulting offer deck',agent:'PROPHET',agentColor:'var(--orange)',priority:'low',time:'4h ago'},
+    {title:'WealthThrone brand guide',agent:'HALO',agentColor:'var(--gold)',priority:'low',time:'6h ago'}
+  ],
+  done:[
+    {title:'✅ Gateway deployment',agent:'VISION',agentColor:'var(--green)',priority:'done',time:'Yesterday'},
+    {title:'✅ Discord server setup',agent:'VISION',agentColor:'var(--green)',priority:'done',time:'Yesterday'},
+    {title:'✅ Agent roles defined',agent:'NEXUS',agentColor:'var(--gold)',priority:'done',time:'2d ago'},
+    {title:'✅ Blueprint v11 finalized',agent:'HALO',agentColor:'var(--gold)',priority:'done',time:'2d ago'}
+  ]
+};
+
+const CAL_EVENTS = {
+  19:[{text:'Daily Standup',type:'cron',desc:'Automated daily agent sync at 08:00 ET'},{text:'Premarket Bias',type:'task',desc:'Generate premarket bias analysis for trading session'}],
+  20:[{text:'WRAITH Full Scan',type:'cron',desc:'Weekly comprehensive lead scan across all verticals'},{text:'Content Review',type:'review',desc:'Review Prophet-generated content for the week'}],
+  21:[{text:'DP6 Sprint Review',type:'review',desc:'Review DP6 membership platform progress'}],
+  22:[{text:'Trading Session',type:'task',desc:'NY Open trading session — Sniper Engine active'}],
+  24:[{text:'WealthThrone Launch',type:'launch',desc:'Soft launch of WealthThrone platform — Category Alpha'},{text:'Weekly Brief',type:'cron',desc:'HALO weekly intelligence briefing'}],
+  25:[{text:'Pipeline Review',type:'review',desc:'ORACLE quarterly pipeline scoring review'}],
+  26:[{text:'FutureMind Sprint',type:'task',desc:'FutureMind Kids development sprint kickoff'}],
+  28:[{text:'Revenue Check',type:'cron',desc:'Monthly revenue metrics analysis'},{text:'Investor Deck',type:'task',desc:'Prepare ZJK Capital quarterly investor update'}],
+  31:[{text:'Month Close',type:'cron',desc:'End of month analytics and reporting'}]
+};
+
+const MESSAGES = [
+  {avatar:'📱',sender:'Godsense',channel:'Telegram',preview:'Build the mission control dashboard — make it LIVE','time':'5 min ago',unread:true},
+  {avatar:'🤖',sender:'NEXUS',channel:'System',preview:'Dashboard build initiated — all systems nominal','time':'4 min ago',unread:true},
+  {avatar:'💬',sender:'HALO',channel:'Discord',preview:'Morning brief complete. 7 agents synchronized.','time':'1h ago',unread:false},
+  {avatar:'👻',sender:'WRAITH',channel:'System',preview:'Charlotte scan complete: 23 qualified targets','time':'2h ago',unread:false},
+  {avatar:'🔮',sender:'ORACLE',channel:'System',preview:'Pipeline scored: 3 auto-approved, 2 for review','time':'3h ago',unread:false},
+  {avatar:'⚡',sender:'PROPHET',channel:'Discord',preview:'3 content pieces ready for distribution','time':'4h ago',unread:false},
+  {avatar:'📱',sender:'Godsense',channel:'Telegram',preview:'Revenue is the proof. Ship faster.','time':'Yesterday',unread:false}
+];
+
+const VENTURES = [
+  {name:'WealthThrone',score:94,cat:'CATEGORY ALPHA',desc:'AI-powered wealth intelligence platform. Premium tier.',gradient:'linear-gradient(90deg,var(--gold),#b8941f)',color:'var(--gold)',tags:['Active','Alpha','Revenue'],progress:78,status:'Active'},
+  {name:'DP6',score:91,cat:'Community',desc:'Premium AI entrepreneur membership community.',gradient:'linear-gradient(90deg,var(--cyan),#0099aa)',color:'var(--cyan)',tags:['Building','Community','Launch Q1'],progress:65,status:'Building'},
+  {name:'FutureMind Kids',score:89,cat:'Education',desc:'AI education platform for children. Gamified learning.',gradient:'linear-gradient(90deg,var(--cyan),#0099aa)',color:'var(--cyan)',tags:['Building','EdTech','Sprint'],progress:40,status:'Building'},
+  {name:'AgentMarket',score:87,cat:'Marketplace',desc:'Marketplace for AI agents and workflows.',gradient:'linear-gradient(90deg,var(--purple),#7c3aed)',color:'var(--purple)',tags:['Planning','Marketplace'],progress:25,status:'Planning'},
+  {name:'CarolinaSignal',score:86,cat:'Local',desc:'AI-powered local business intelligence for the Carolinas.',gradient:'linear-gradient(90deg,var(--purple),#7c3aed)',color:'var(--purple)',tags:['Planning','Local','B2B'],progress:20,status:'Planning'}
+];
+
+// ============ STATE ============
+let currentTab = 'command';
+let moreOpen = false;
+let dismissedAlerts = JSON.parse(localStorage.getItem('ntic_dismissed')||'[]');
+let savedMessages = JSON.parse(localStorage.getItem('ntic_messages')||'[]');
+let consoleHistory = [];
+let historyIdx = -1;
+let agentStartTimes = {};
+AGENTS.forEach(a => agentStartTimes[a.id] = Date.now() - Math.floor(Math.random()*300000));
+let autoRunCount = Math.floor(Math.random()*20)+30;
+
+// ============ INIT ============
+document.addEventListener('DOMContentLoaded', init);
+
+function init(){
+  renderKPIs();
+  renderAlerts();
+  renderTabBar();
+  renderBottomNav();
+  renderCommand();
+  renderAgents();
+  renderPipeline();
+  renderKanban();
+  renderCalendar();
+  renderComms();
+  renderVentures();
+  renderTrading();
+  initConsole();
+  startClock();
+  startHeartbeats();
+  startFeed();
+  startAutoRunCounter();
+}
+
+// ============ CLOCK ============
+function startClock(){
+  function tick(){
+    const now = new Date();
+    const t = now.toLocaleTimeString('en-US',{hour12:false,timeZone:'America/New_York'});
+    document.getElementById('live-clock').textContent = t + ' ET';
+    document.getElementById('footer-time').textContent = now.toLocaleString('en-US',{timeZone:'America/New_York',dateStyle:'full',timeStyle:'medium'});
+  }
+  tick();
+  setInterval(tick,1000);
+}
+
+// ============ KPIs ============
+function renderKPIs(){
+  const c = document.getElementById('kpi-row');
+  const kpis = [
+    {label:'System Health',value:'●',sub:'All Systems Go',cls:'color:var(--green);animation:pulse 2s infinite;font-size:2rem'},
+    {label:'Active Agents',value:'7/7',sub:'All Online',cls:'color:var(--cyan)'},
+    {label:'Live Services',value:'4/4',sub:'TG ✓ DC ✓ Web ✓ Brave ✓',cls:'color:var(--green)'},
+    {label:'Pipeline Value',value:'$14.5K',sub:'↑ 12% this week',cls:'color:var(--gold)'},
+    {label:'Revenue MRR',value:'$0',sub:'→ Target: $10K',cls:'color:var(--orange)'},
+    {label:'Auto Runs',value:autoRunCount.toString(),sub:'Today',cls:'color:var(--purple)',id:'auto-runs'}
+  ];
+  c.innerHTML = kpis.map(k=>`<div class="kpi-card glass"><div class="label">${k.label}</div><div class="value" style="${k.cls}" ${k.id?'id="'+k.id+'"':''}>${k.value}</div><div class="sub">${k.sub}</div></div>`).join('');
+}
+
+function startAutoRunCounter(){
+  setInterval(()=>{
+    autoRunCount++;
+    const el = document.getElementById('auto-runs');
+    if(el) el.textContent = autoRunCount;
+  },45000);
+}
+
+// ============ ALERTS ============
+function renderAlerts(){
+  const track = document.getElementById('alert-track');
+  const visible = ALERTS_DATA.filter((_,i)=>!dismissedAlerts.includes(i));
+  const html = visible.map((a,i)=>{
+    const realIdx = ALERTS_DATA.indexOf(a);
+    return `<div class="alert-item ${a.type}">${a.text} <span class="x" onclick="dismissAlert(event,${realIdx})">✕</span></div>`;
+  }).join('');
+  track.innerHTML = html + html; // duplicate for seamless scroll
+}
+function dismissAlert(e,idx){
+  e.stopPropagation();
+  dismissedAlerts.push(idx);
+  localStorage.setItem('ntic_dismissed',JSON.stringify(dismissedAlerts));
+  renderAlerts();
+}
+
+// ============ TABS ============
+function renderTabBar(){
+  const bar = document.getElementById('tab-bar');
+  bar.innerHTML = TABS.map(t=>`<button class="tab-btn ${t.id===currentTab?'active':''}" data-tab="${t.id}" onclick="switchTab('${t.id}')">${t.icon} ${t.label}</button>`).join('');
+}
+
+function switchTab(id){
+  currentTab = id;
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.toggle('active',b.dataset.tab===id)});
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    const t = b.dataset.tab;
+    b.classList.toggle('active', t===id || (t==='more' && !['command','agents','pipeline','comms'].includes(id)));
   });
+  moreOpen = false;
+  document.getElementById('more-menu').classList.remove('show');
+}
+
+function renderBottomNav(){
+  const nav = document.getElementById('bottom-nav');
+  const primary = [{id:'command',icon:'⚔️',label:'Command'},{id:'agents',icon:'🤖',label:'Agents'},{id:'pipeline',icon:'📊',label:'Pipeline'},{id:'comms',icon:'💬',label:'Comms'}];
+  let html = primary.map(t=>`<button class="nav-btn ${t.id===currentTab?'active':''}" data-tab="${t.id}" onclick="switchTab('${t.id}')"><span class="nav-icon">${t.icon}</span>${t.label}<span class="nav-indicator"></span></button>`).join('');
+  html += `<button class="nav-btn" data-tab="more" onclick="toggleMore()"><span class="nav-icon">⋯</span>More<span class="nav-indicator"></span></button>`;
+  nav.innerHTML = html;
+
+  const mm = document.getElementById('more-menu');
+  const extras = TABS.filter(t=>!['command','agents','pipeline','comms'].includes(t.id));
+  mm.innerHTML = extras.map(t=>`<div class="more-menu-item" onclick="switchTab('${t.id}')">${t.icon} ${t.label}</div>`).join('');
+}
+
+function toggleMore(){
+  moreOpen = !moreOpen;
+  document.getElementById('more-menu').classList.toggle('show',moreOpen);
+}
+
+// ============ STATUS POPUP ============
+function toggleStatusPopup(){
+  const p = document.getElementById('statusPopup');
+  const o = document.getElementById('overlay');
+  const show = !p.classList.contains('show');
+  p.classList.toggle('show',show);
+  o.classList.toggle('show',show);
+  if(show){
+    document.getElementById('svc-list').innerHTML = SERVICES.map(s=>`<div class="svc"><span class="dot" style="background:${s.color}"></span><span>${s.name}: <strong style="color:${s.color}">${s.status}</strong></span></div>`).join('');
+  }
+}
+
+// ============ COMMAND TAB ============
+function renderCommand(){
+  // War room feed
+  const wr = document.getElementById('war-room');
+  wr.innerHTML = FEED_DATA.map(f=>{
+    const now = new Date();
+    const ts = (now.getHours().toString().padStart(2,'0'))+':'+(now.getMinutes().toString().padStart(2,'0'));
+    return `<div class="feed-entry"><span class="agent-icon">${f.agent}</span><div class="content"><div class="ts">${ts} · ${f.name}</div><div class="msg">${f.msg}</div><span class="badge badge-${f.badge}">${f.badge}</span></div></div>`;
+  }).join('');
+
+  // Quick actions
+  const qa = document.getElementById('quick-actions');
+  const actions = [
+    {icon:'👻',label:'Run WRAITH Scan',action:'wraith'},
+    {icon:'🔮',label:'ORACLE Score',action:'oracle'},
+    {icon:'👑',label:'HALO Brief',action:'halo'},
+    {icon:'💚',label:'System Health',action:'health'},
+    {icon:'📋',label:'Trigger Report',action:'report'},
+    {icon:'🛑',label:'Emergency Stop',action:'stop',danger:true}
+  ];
+  qa.innerHTML = actions.map(a=>`<button class="qa-btn ${a.danger?'danger':''}" onclick="qaAction('${a.action}')"><div class="icon">${a.icon}</div><div class="lbl">${a.label}</div></button>`).join('');
+
+  // Services
+  const sg = document.getElementById('svc-grid');
+  sg.innerHTML = SERVICES.map(s=>`<div class="svc-item"><span class="svc-dot" style="background:${s.color}"></span>${s.name}: ${s.status}</div>`).join('');
+}
+
+function qaAction(action){
+  const msgs = {
+    wraith:'👻 WRAITH scan initiated — scanning all verticals...',
+    oracle:'🔮 ORACLE scoring pipeline triggered — evaluating queue...',
+    halo:'👑 HALO generating morning intelligence brief...',
+    health:'💚 Running full system health check...',
+    report:'📋 Generating comprehensive status report...',
+    stop:'🛑 EMERGENCY STOP — all agents pausing...'
+  };
+  const fb = document.getElementById('qa-feedback');
+  fb.textContent = msgs[action]||'Action triggered';
+  fb.style.display = 'block';
+  fb.style.background = action==='stop'?'rgba(239,68,68,0.9)':'rgba(212,175,55,0.9)';
+  fb.style.color = action==='stop'?'#fff':'#000';
+  setTimeout(()=>{fb.style.display='none'},2500);
+
+  // Add to feed
+  addFeedEntry(msgs[action].split(' ')[0], msgs[action].split(' ').slice(0,1).join(''), msgs[action].substring(msgs[action].indexOf(' ')+1), action==='stop'?'pending':'active');
+}
+
+function addFeedEntry(icon, name, msg, badge){
+  const wr = document.getElementById('war-room');
+  const now = new Date();
+  const ts = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');
+  const entry = document.createElement('div');
+  entry.className = 'feed-entry';
+  entry.style.animation = 'slideIn 0.4s ease';
+  entry.innerHTML = `<span class="agent-icon">${icon}</span><div class="content"><div class="ts">${ts} · ${name}</div><div class="msg">${msg}</div><span class="badge badge-${badge}">${badge}</span></div>`;
+  wr.insertBefore(entry, wr.firstChild);
+}
+
+function startFeed(){
+  const entries = [
+    {icon:'👻',name:'WRAITH',msg:'New lead: AAA Heating & Cooling, Charlotte NC',badge:'success'},
+    {icon:'🔮',name:'ORACLE',msg:'Re-scored Local Business AI: 76 → 78',badge:'active'},
+    {icon:'👁️',name:'VISION',msg:'All health checks passed — latency normal',badge:'success'},
+    {icon:'⚡',name:'PROPHET',msg:'Scheduled Twitter thread for 10:00 ET',badge:'active'},
+    {icon:'👑',name:'HALO',msg:'Task queue optimized — 3 items redistributed',badge:'success'},
+    {icon:'🏛️',name:'NEXUS',msg:'Doctrine check: revenue vertical prioritized',badge:'active'},
+    {icon:'👻',name:'WRAITH',msg:'Qualified: Premier Electric, Raleigh NC',badge:'success'},
+    {icon:'🔮',name:'ORACLE',msg:'DP6 Membership confidence: 88% → hold',badge:'active'}
+  ];
+  let idx = 0;
+  setInterval(()=>{
+    if(currentTab !== 'command') return;
+    const e = entries[idx % entries.length];
+    addFeedEntry(e.icon, e.name, e.msg, e.badge);
+    idx++;
+    autoRunCount++;
+    const el = document.getElementById('auto-runs');
+    if(el) el.textContent = autoRunCount;
+  }, 8000);
+}
+
+// ============ AGENTS TAB ============
+function renderAgents(){
+  const g = document.getElementById('agents-grid');
+  g.innerHTML = AGENTS.map(a=>{
+    const statusColor = a.status==='active'?'var(--green)':'var(--text3)';
+    const anim = a.status==='active'?'animation:pulse 2s infinite;':'';
+    let stats = '';
+    if(a.queue !== null) stats += `<div class="stat-row"><span>Queue</span><span>${a.queue}</span></div>`;
+    if(a.scored !== null) stats += `<div class="stat-row"><span>Scored</span><span>${a.scored}</span></div>`;
+    if(a.targets !== null) stats += `<div class="stat-row"><span>Targets</span><span>${a.targets}</span></div>`;
+    if(a.health !== null) stats += `<div class="stat-row"><span>Health</span><span style="color:var(--green)">${a.health}</span></div>`;
+    if(a.content !== null) stats += `<div class="stat-row"><span>Content</span><span>${a.content}</span></div>`;
+    if(a.directives !== null) stats += `<div class="stat-row"><span>Directives</span><span>${a.directives}</span></div>`;
+    const progW = a.status==='active'?Math.floor(Math.random()*60+30):0;
+    return `<div class="agent-card glass" style="border-color:${a.color}22" onclick="this.classList.toggle('expanded')" data-agent="${a.id}">
+      <div class="agent-header"><div><div class="agent-name">${a.icon} ${a.name}</div><div class="agent-role">${a.role}</div></div><div class="status-dot" style="background:${statusColor};${anim}"></div></div>
+      <div class="stat-row"><span>Last Action</span><span style="font-size:0.65rem">${a.lastAction}</span></div>
+      <div class="stat-row"><span>Heartbeat</span><span class="hb-timer" data-agent="${a.id}" style="color:var(--cyan)">0s ago</span></div>
+      ${stats}
+      <div class="progress"><div class="progress-fill" style="width:${progW}%;background:${a.color}"></div></div>
+      <div class="details">${a.details}</div>
+    </div>`;
+  }).join('');
+}
+
+function startHeartbeats(){
+  setInterval(()=>{
+    document.querySelectorAll('.hb-timer').forEach(el=>{
+      const id = el.dataset.agent;
+      const elapsed = Math.floor((Date.now()-agentStartTimes[id])/1000);
+      if(elapsed < 60) el.textContent = elapsed+'s ago';
+      else if(elapsed < 3600) el.textContent = Math.floor(elapsed/60)+'m ago';
+      else el.textContent = Math.floor(elapsed/3600)+'h ago';
+    });
+  },1000);
+  // Reset random agent heartbeats
+  setInterval(()=>{
+    const ids = Object.keys(agentStartTimes);
+    const id = ids[Math.floor(Math.random()*ids.length)];
+    agentStartTimes[id] = Date.now();
+  },15000);
+}
+
+// ============ PIPELINE TAB ============
+function renderPipeline(){
+  const c = document.getElementById('pipeline-content');
+  const total = [...PIPELINE.auto,...PIPELINE.review].reduce((s,p)=>s+(p.min+p.max)/2,0);
+  
+  function ringHTML(score, color){
+    const r = 20, circ = 2*Math.PI*r, offset = circ - (score/100)*circ;
+    return `<div class="score-ring" style="color:${color}"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="${r}" stroke="rgba(255,255,255,0.05)" /><circle cx="24" cy="24" r="${r}" stroke="${color}" stroke-dasharray="${circ}" stroke-dashoffset="${offset}" style="transition:stroke-dashoffset 1.5s ease"/></svg>${score}</div>`;
+  }
+
+  function rows(items, color){
+    return items.map((p,i)=>`<div class="pipe-row" onclick="togglePipeDetail(this)">
+      ${ringHTML(p.score, color)}
+      <div class="pipe-info"><div class="pipe-name">${p.name}</div><div class="pipe-cat">${p.cat}</div></div>
+      <div class="pipe-value">$${(p.min/1000).toFixed(0)}-${(p.max/1000).toFixed(0)}K/mo</div>
+    </div><div class="pipe-details">${p.desc}</div>`).join('');
+  }
+
+  c.innerHTML = `
+    <div class="pipeline-total glass"><div class="lbl">Total Pipeline Value</div><div class="amount" id="pipe-total">$0</div></div>
+    <div class="pipeline-section"><h3 class="auto">✅ AUTO-APPROVED (Score ≥ 85)</h3>${rows(PIPELINE.auto,'var(--green)')}</div>
+    <div class="pipeline-section"><h3 class="review">👁️ OPERATOR REVIEW (Score 70-84)</h3>${rows(PIPELINE.review,'var(--orange)')}</div>
+  `;
+
+  // Animate total
+  animateCounter('pipe-total', 0, total, 2000, '$', '/mo');
+}
+
+function togglePipeDetail(el){
+  const det = el.nextElementSibling;
+  if(det && det.classList.contains('pipe-details')) det.classList.toggle('show');
+}
+
+function animateCounter(id, start, end, duration, prefix='', suffix=''){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const startTime = performance.now();
+  function update(now){
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed/duration,1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const val = Math.floor(start + (end - start) * eased);
+    el.textContent = prefix + val.toLocaleString() + suffix;
+    if(progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+// ============ KANBAN ============
+function renderKanban(){
+  const k = document.getElementById('kanban');
+  const cols = [{key:'queue',label:'📥 Queue',color:'var(--cyan)'},{key:'active',label:'⚡ Active',color:'var(--gold)'},{key:'review',label:'👁️ Review',color:'var(--purple)'},{key:'done',label:'✅ Done',color:'var(--green)'}];
+  
+  k.innerHTML = cols.map(col=>{
+    const cards = KANBAN_DATA[col.key];
+    return `<div class="kanban-col" data-col="${col.key}" ondragover="event.preventDefault()" ondrop="kanbanDrop(event,'${col.key}')">
+      <h4>${col.label} <span class="count">${cards.length}</span></h4>
+      ${cards.map((c,i)=>`<div class="k-card ${c.priority}" draggable="true" ondragstart="kanbanDragStart(event,'${col.key}',${i})">
+        <div class="title">${c.title}</div>
+        <div class="meta"><span class="agent-pill" style="background:${c.agentColor}22;color:${c.agentColor}">${c.agent}</span><span>${c.time}</span></div>
+      </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+let dragData = null;
+function kanbanDragStart(e, col, idx){
+  dragData = {col, idx};
+  e.dataTransfer.effectAllowed = 'move';
+}
+function kanbanDrop(e, targetCol){
+  e.preventDefault();
+  if(!dragData || dragData.col === targetCol) return;
+  const card = KANBAN_DATA[dragData.col].splice(dragData.idx, 1)[0];
+  KANBAN_DATA[targetCol].push(card);
+  if(targetCol === 'done') card.priority = 'done';
+  dragData = null;
+  renderKanban();
+}
+
+// ============ CALENDAR ============
+function renderCalendar(){
+  const c = document.getElementById('calendar-content');
+  const now = new Date();
+  const year = 2026, month = 2; // March 2026
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const today = 19; // March 19, 2026
+
+  const dayLabels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let grid = dayLabels.map(d=>`<div class="cal-day-label">${d}</div>`).join('');
+  
+  for(let i=0;i<firstDay;i++) grid += `<div class="cal-cell empty"></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const isToday = d === today;
+    const events = CAL_EVENTS[d]||[];
+    grid += `<div class="cal-cell ${isToday?'today':''}"><div class="day-num">${d}</div>${events.map(ev=>`<div class="cal-event ${ev.type}" onclick="showEvt('${ev.text}','${ev.desc}')">${ev.text}</div>`).join('')}</div>`;
+  }
+
+  c.innerHTML = `
+    <div class="cal-header glass"><button class="cal-nav" style="visibility:hidden">‹</button><h3>March 2026</h3><button class="cal-nav" style="visibility:hidden">›</button></div>
+    <div class="cal-grid">${grid}</div>
+  `;
+}
+
+function showEvt(title, desc){
+  document.getElementById('evt-title').textContent = title;
+  document.getElementById('evt-desc').textContent = desc;
+  document.getElementById('evt-popup').classList.add('show');
+  document.getElementById('evt-overlay').style.display = 'block';
+}
+function closeEvtPopup(){
+  document.getElementById('evt-popup').classList.remove('show');
+  document.getElementById('evt-overlay').style.display = 'none';
+}
+
+// ============ COMMS ============
+function renderComms(){
+  const w = document.getElementById('comms-wrap');
+  const allMsgs = [...MESSAGES, ...savedMessages];
+  const channels = ['All','Telegram','Discord','System'];
+  
+  w.innerHTML = `
+    <div class="channel-filters">${channels.map((ch,i)=>`<span class="ch-pill ${i===0?'active':''}" onclick="filterComms('${ch}',this)">${ch}</span>`).join('')}</div>
+    <div class="msg-list" id="msg-list">${allMsgs.map(m=>`<div class="msg-item" data-channel="${m.channel}">
+      <div class="avatar">${m.avatar}</div>
+      <div class="msg-content"><div class="msg-head"><span class="sender">${m.sender} <span class="channel-tag">${m.channel}</span></span><span class="time">${m.time}</span></div><div class="preview">${m.preview}</div></div>
+      ${m.unread?'<div class="unread"></div>':''}
+    </div>`).join('')}</div>
+    <div class="compose-bar">
+      <select id="compose-ch"><option>Telegram</option><option>Discord</option><option>System</option></select>
+      <input type="text" id="compose-input" placeholder="Type a message...">
+      <button class="send-btn" onclick="sendCompose()">Send</button>
+    </div>
+  `;
+}
+
+function filterComms(ch, el){
+  document.querySelectorAll('.ch-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.msg-item').forEach(m=>{
+    m.style.display = (ch==='All'||m.dataset.channel===ch)?'flex':'none';
+  });
+}
+
+function sendCompose(){
+  const input = document.getElementById('compose-input');
+  const ch = document.getElementById('compose-ch').value;
+  const text = input.value.trim();
+  if(!text) return;
+  
+  const msg = {avatar:'📱',sender:'You',channel:ch,preview:text,time:'Just now',unread:false};
+  savedMessages.push(msg);
+  localStorage.setItem('ntic_messages',JSON.stringify(savedMessages));
+  input.value = '';
+  renderComms();
+  
+  // Scroll to bottom
+  const list = document.getElementById('msg-list');
+  if(list) list.scrollTop = list.scrollHeight;
+}
+
+// ============ VENTURES ============
+function renderVentures(){
+  const g = document.getElementById('ventures-grid');
+  g.innerHTML = VENTURES.map(v=>`<div class="venture-card">
+    <div class="top-bar" style="background:${v.gradient}"></div>
+    <div class="body">
+      <div class="score" style="color:${v.color}">${v.score}</div>
+      <div class="name">${v.name}</div>
+      <div class="desc">${v.desc}</div>
+      <div class="tags">${v.tags.map(t=>`<span class="tag" style="background:${v.color}22;color:${v.color}">${t}</span>`).join('')}</div>
+      <div class="prog"><div class="prog-fill" style="width:${v.progress}%;background:${v.gradient}"></div></div>
+    </div>
+  </div>`).join('');
+}
+
+// ============ TRADING ============
+function renderTrading(){
+  const g = document.getElementById('trading-grid');
+  
+  // Calculate countdown to next sessions
+  function getCountdown(hour,minute){
+    const now = new Date();
+    const et = new Date(now.toLocaleString('en-US',{timeZone:'America/New_York'}));
+    let target = new Date(et);
+    target.setHours(hour,minute,0,0);
+    if(target <= et) target.setDate(target.getDate()+1);
+    const diff = target - et;
+    const h = Math.floor(diff/3600000);
+    const m = Math.floor((diff%3600000)/60000);
+    const s = Math.floor((diff%60000)/1000);
+    return `${h}h ${m}m ${s}s`;
+  }
+
+  g.innerHTML = `
+    <div class="trade-card glass">
+      <h4>⚡ Sniper Engine Status</h4>
+      <div class="trade-stat"><span class="k">Mode</span><span class="v" style="color:var(--cyan)">Practice</span></div>
+      <div class="trade-stat"><span class="k">Daily Target</span><span class="v">$200</span></div>
+      <div class="trade-stat"><span class="k">Max Contracts</span><span class="v">2</span></div>
+      <div class="trade-stat"><span class="k">Loss Limit</span><span class="v" style="color:var(--red)">-$150</span></div>
+      <div class="trade-stat"><span class="k">Status</span><span class="v" style="color:var(--orange)">Building</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="acct-card glass"><div class="type">Funded Account</div><div class="bal" style="color:var(--green)">$285</div></div>
+      <div class="acct-card glass"><div class="type">Combine</div><div class="bal" style="color:var(--cyan)">$50,000</div></div>
+      <div class="acct-card glass"><div class="type">Practice</div><div class="bal" style="color:var(--text2)">$162,000</div></div>
+    </div>
+    <div>
+      <h4 style="font-family:var(--font-data);font-size:0.8rem;color:var(--text2);margin-bottom:8px">📅 SESSION SCHEDULE</h4>
+      <div class="session-timer" id="timer-pre"><div class="name">Pre-Market (07:00 ET)</div><div class="countdown" id="cd-pre">--</div></div>
+      <div class="session-timer" id="timer-open"><div class="name">NY Open (09:30 ET)</div><div class="countdown" id="cd-open">--</div></div>
+      <div class="session-timer" id="timer-pm"><div class="name">NY PM (13:00 ET)</div><div class="countdown" id="cd-pm">--</div></div>
+      <div style="margin-top:12px;padding:12px;border-radius:var(--radius-sm);background:var(--glass);text-align:center">
+        <div style="font-size:0.7rem;color:var(--text3);font-family:var(--font-data)">TODAY'S P&L</div>
+        <div style="font-size:1.8rem;font-weight:700;font-family:var(--font-data);color:var(--text2)" id="pnl">$0.00</div>
+      </div>
+    </div>
+    <div class="trade-card glass">
+      <h4>📡 Signal Feed</h4>
+      <div style="text-align:center;padding:30px 0;color:var(--text3);font-size:0.8rem">
+        <div style="font-size:2rem;margin-bottom:8px">📡</div>
+        Awaiting signals...<br><span style="font-size:0.65rem">Signals appear here during active sessions</span>
+      </div>
+    </div>
+  `;
+
+  // Update timers
+  function updateTimers(){
+    const cd = (h,m)=>{
+      const now = new Date();
+      const et = new Date(now.toLocaleString('en-US',{timeZone:'America/New_York'}));
+      let target = new Date(et); target.setHours(h,m,0,0);
+      if(target<=et) target.setDate(target.getDate()+1);
+      const diff = target-et;
+      const hrs=Math.floor(diff/3600000),min=Math.floor((diff%3600000)/60000),sec=Math.floor((diff%60000)/1000);
+      return `${hrs}h ${String(min).padStart(2,'0')}m ${String(sec).padStart(2,'0')}s`;
+    };
+    const pre=document.getElementById('cd-pre'),open=document.getElementById('cd-open'),pm=document.getElementById('cd-pm');
+    if(pre)pre.textContent=cd(7,0);
+    if(open)open.textContent=cd(9,30);
+    if(pm)pm.textContent=cd(13,0);
+  }
+  updateTimers();
+  setInterval(updateTimers,1000);
+}
+
+// ============ CONSOLE ============
+function initConsole(){
+  const input = document.getElementById('console-in');
+  const output = document.getElementById('console-output');
+  
+  // Welcome
+  appendConsole('sys-line','NEXUS THRONE INTELLIGENCE CAPITAL — Command Console v3');
+  appendConsole('sys-line','Type "help" for available commands.');
+  appendConsole('res-line','');
+
+  input.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){
+      const cmd = input.value.trim().toLowerCase();
+      if(!cmd) return;
+      consoleHistory.push(cmd);
+      historyIdx = consoleHistory.length;
+      appendConsole('cmd-line','nexus@throne:~$ '+cmd);
+      input.value = '';
+      processCmd(cmd);
+    } else if(e.key==='ArrowUp'){
+      e.preventDefault();
+      if(historyIdx>0){historyIdx--;input.value=consoleHistory[historyIdx]}
+    } else if(e.key==='ArrowDown'){
+      e.preventDefault();
+      if(historyIdx<consoleHistory.length-1){historyIdx++;input.value=consoleHistory[historyIdx]}
+      else{historyIdx=consoleHistory.length;input.value=''}
+    }
+  });
+}
+
+function appendConsole(cls,text){
+  const output = document.getElementById('console-output');
+  const line = document.createElement('div');
+  line.className = cls;
+  line.textContent = text;
+  output.appendChild(line);
+  output.scrollTop = output.scrollHeight;
+}
+
+function typeConsole(cls,text,delay=20){
+  const output = document.getElementById('console-output');
+  const line = document.createElement('div');
+  line.className = cls;
+  output.appendChild(line);
+  let i=0;
+  function next(){
+    if(i<text.length){line.textContent+=text[i];i++;output.scrollTop=output.scrollHeight;setTimeout(next,delay)}
+  }
+  next();
+}
+
+function processCmd(cmd){
+  const responses = {
+    'help':[
+      'Available commands:',
+      '  status     — System status overview',
+      '  agents     — List all agents and status',
+      '  pipeline   — Pipeline summary',
+      '  services   — Service health check',
+      '  wraith scan — Initiate WRAITH recon scan',
+      '  oracle score — Run ORACLE scoring',
+      '  ventures   — Venture portfolio',
+      '  clear      — Clear console',
+      '  help       — Show this help'
+    ],
+    'status':[
+      '╔══════════════════════════════════╗',
+      '║   NEXUS THRONE — SYSTEM STATUS   ║',
+      '╠══════════════════════════════════╣',
+      '║ Status:    OPERATIONAL           ║',
+      '║ Agents:    7/7 Online            ║',
+      '║ Services:  8/8 Connected         ║',
+      '║ Pipeline:  $14.5K Active         ║',
+      '║ MRR:       $0 → $10K Target      ║',
+      '║ Auto Runs: '+autoRunCount+' today              ║',
+      '║ Uptime:    99.9%                 ║',
+      '╚══════════════════════════════════╝'
+    ],
+    'agents':[
+      'AGENT ROSTER:',
+      '  👑 HALO    — Command Hub     [ACTIVE]  Queue: 3',
+      '  🔮 ORACLE  — Decision Intel  [ACTIVE]  Scored: 47',
+      '  👻 WRAITH  — Recon Hunter    [ACTIVE]  Targets: 23',
+      '  👁️ VISION  — System Guard    [ACTIVE]  Health: ✅',
+      '  ⚡ PROPHET — Content Engine  [ACTIVE]  Content: 12',
+      '  ⚖️ LEGIS   — Compliance      [STANDBY]',
+      '  🏛️ NEXUS   — Strategic Cmd   [ACTIVE]  Directives: 14'
+    ],
+    'pipeline':[
+      'PIPELINE SUMMARY:',
+      '  AUTO-APPROVED:',
+      '    AI Consulting    92  $5-15K/mo',
+      '    AI Workforce     89  $2.5-5K/mo',
+      '    DP6 Membership   88  $3-9K/mo',
+      '  OPERATOR REVIEW:',
+      '    Voice Content    78  $1-3K/mo',
+      '    Local Biz AI     76  $3-10K/mo',
+      '  ─────────────────────────────',
+      '  TOTAL: ~$14,500/mo potential'
+    ],
+    'services':[
+      'SERVICE HEALTH:',
+      ...SERVICES.map(s=>`  ● ${s.name}: ${s.status.toUpperCase()}`)
+    ],
+    'wraith scan':[
+      '👻 WRAITH RECON — Scanning...',
+      '  [████████████████████] 100%',
+      '  Verticals: HVAC, Plumbing, Electrical',
+      '  Region: Charlotte, NC',
+      '  Results: 5 new qualified targets',
+      '  → AAA Heating & Cooling (Score: 84)',
+      '  → Premier Electric (Score: 81)',
+      '  → QualityAir HVAC (Score: 79)',
+      '  → Carolina Plumbing Pro (Score: 77)',
+      '  → Blue Ridge Mechanical (Score: 74)',
+      '  Scan complete. Targets queued for ORACLE.'
+    ],
+    'oracle score':[
+      '🔮 ORACLE — Scoring Pipeline...',
+      '  Processing 5 opportunities...',
+      '  [████████████████████] 100%',
+      '  Results:',
+      '  ✅ AI Consulting: 92 → AUTO-APPROVED',
+      '  ✅ AI Workforce:  89 → AUTO-APPROVED',
+      '  ✅ DP6 Membership: 88 → AUTO-APPROVED',
+      '  👁️ Voice Content:  78 → REVIEW',
+      '  👁️ Local Biz AI:   76 → REVIEW',
+      '  3 auto-approved, 2 pending review.'
+    ],
+    'ventures':[
+      'VENTURE PORTFOLIO:',
+      ...VENTURES.map(v=>`  ${v.score} — ${v.name} (${v.status}) ${v.progress}%`)
+    ],
+    'clear':[]
+  };
+
+  if(cmd==='clear'){
+    document.getElementById('console-output').innerHTML='';
+    return;
+  }
+
+  const lines = responses[cmd];
+  if(lines){
+    let delay = 0;
+    lines.forEach((line,i)=>{
+      setTimeout(()=>appendConsole('res-line',line), delay);
+      delay += 40;
+    });
+  } else {
+    appendConsole('err-line',`Command not found: ${cmd}. Type "help" for available commands.`);
+  }
+}
+
+// ============ TOUCH DRAG FOR KANBAN (mobile) ============
+document.addEventListener('touchstart', function(e){
+  const card = e.target.closest('.k-card');
+  if(!card) return;
+  const col = card.closest('.kanban-col');
+  if(!col) return;
+  
+  const colKey = col.dataset.col;
+  const cards = [...col.querySelectorAll('.k-card')];
+  const idx = cards.indexOf(card);
+  
+  let startX = e.touches[0].clientX;
+  let moved = false;
+  
+  function onMove(ev){
+    const dx = ev.touches[0].clientX - startX;
+    if(Math.abs(dx) > 40) moved = true;
+    card.style.transform = `translateX(${dx}px)`;
+    card.style.opacity = Math.max(0.3, 1 - Math.abs(dx)/200);
+  }
+  
+  function onEnd(ev){
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onEnd);
+    card.style.transform = '';
+    card.style.opacity = '';
+    
+    if(!moved) return;
+    const dx = ev.changedTouches[0].clientX - startX;
+    const colKeys = ['queue','active','review','done'];
+    const curIdx = colKeys.indexOf(colKey);
+    let targetIdx = curIdx;
+    if(dx > 60 && curIdx < colKeys.length-1) targetIdx = curIdx+1;
+    else if(dx < -60 && curIdx > 0) targetIdx = curIdx-1;
+    
+    if(targetIdx !== curIdx){
+      const item = KANBAN_DATA[colKey].splice(idx, 1)[0];
+      if(colKeys[targetIdx]==='done') item.priority='done';
+      KANBAN_DATA[colKeys[targetIdx]].push(item);
+      renderKanban();
+    }
+  }
+  
+  document.addEventListener('touchmove', onMove, {passive:true});
+  document.addEventListener('touchend', onEnd);
+},{passive:true});
+
+// Close more menu on outside click
+document.addEventListener('click', e=>{
+  if(moreOpen && !e.target.closest('.more-menu') && !e.target.closest('[data-tab="more"]')){
+    moreOpen = false;
+    document.getElementById('more-menu').classList.remove('show');
+  }
 });
 </script>
 </body>
