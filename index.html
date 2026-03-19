@@ -2,458 +2,486 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NTIC Mission Control — ZJK Capital</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NEXUS Command Center</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0f; color: #e0e0e0; min-height: 100vh; }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap');
   
-  .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 20px 30px; border-bottom: 2px solid #d4af37; display: flex; justify-content: space-between; align-items: center; }
-  .header h1 { color: #d4af37; font-size: 24px; letter-spacing: 2px; }
-  .header .subtitle { color: #888; font-size: 13px; margin-top: 4px; }
-  .header .status { display: flex; gap: 12px; align-items: center; }
-  .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-  .status-dot.green { background: #00ff88; box-shadow: 0 0 8px #00ff88; }
-  .status-dot.yellow { background: #ffd700; box-shadow: 0 0 8px #ffd700; }
-  .status-dot.red { background: #ff4444; box-shadow: 0 0 8px #ff4444; }
-  .status-label { font-size: 12px; color: #aaa; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  
+  :root {
+    --bg: #06080F; --surface: #0C1019; --card: #111827; --card-hover: #1a2235;
+    --gold: #D4AF37; --gold-glow: rgba(212,175,55,0.3); --cyan: #00E5FF; --cyan-glow: rgba(0,229,255,0.15);
+    --purple: #A855F7; --purple-glow: rgba(168,85,247,0.15); --green: #10B981; --red: #EF4444;
+    --orange: #F59E0B; --blue: #3B82F6;
+    --text: #F1F5F9; --text-muted: #64748B; --text-dim: #334155;
+    --border: rgba(255,255,255,0.06); --glass: rgba(255,255,255,0.03);
+    --radius: 16px; --radius-sm: 10px; --radius-xs: 6px;
+  }
+  
+  body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+  
+  /* GRID LINES BACKGROUND */
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: 0;
+    background: 
+      linear-gradient(rgba(212,175,55,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212,175,55,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask: radial-gradient(ellipse at 50% 0%, black 0%, transparent 70%);
+  }
+  
+  /* HEADER */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(6,8,15,0.85); backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--border); padding: 12px 16px;
+  }
+  .header-top { display: flex; justify-content: space-between; align-items: center; }
+  .header-brand { display: flex; align-items: center; gap: 10px; }
+  .header-brand .crown { font-size: 22px; }
+  .header-brand h1 { font-size: 15px; font-weight: 700; letter-spacing: 2px; background: linear-gradient(135deg, var(--gold), #FDE68A); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .header-brand .sub { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; margin-top: 1px; }
+  .header-status { display: flex; gap: 6px; align-items: center; }
+  .status-pip { width: 6px; height: 6px; border-radius: 50%; }
+  .pip-on { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse-pip 2s infinite; }
+  .pip-warn { background: var(--orange); box-shadow: 0 0 8px var(--orange); }
+  @keyframes pulse-pip { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .status-text { font-size: 10px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
 
-  .tabs { display: flex; background: #111; border-bottom: 1px solid #222; padding: 0 20px; }
-  .tab { padding: 12px 24px; cursor: pointer; color: #666; font-size: 14px; font-weight: 600; border-bottom: 2px solid transparent; transition: all 0.2s; }
-  .tab:hover { color: #ccc; }
-  .tab.active { color: #d4af37; border-bottom-color: #d4af37; }
+  /* METRICS BAR */
+  .metrics-bar {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+  }
+  .metric-mini {
+    background: var(--glass); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 10px; text-align: center; position: relative; overflow: hidden;
+  }
+  .metric-mini::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+  .metric-mini .val { font-size: 20px; font-weight: 900; background: linear-gradient(135deg, var(--gold), #FDE68A); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .metric-mini .lbl { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
 
-  .content { padding: 20px; display: none; }
-  .content.active { display: block; }
+  /* NAV TABS */
+  .nav-tabs {
+    display: flex; gap: 4px; padding: 8px 16px; overflow-x: auto; scrollbar-width: none;
+    border-bottom: 1px solid var(--border); -webkit-overflow-scrolling: touch;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    flex-shrink: 0; padding: 8px 16px; border-radius: 999px; font-size: 12px; font-weight: 600;
+    color: var(--text-muted); cursor: pointer; transition: all 0.2s; border: 1px solid transparent;
+    white-space: nowrap; user-select: none;
+  }
+  .nav-tab:hover { color: var(--text); background: var(--glass); }
+  .nav-tab.active { color: var(--gold); background: var(--gold-glow); border-color: rgba(212,175,55,0.2); }
+
+  /* CONTENT AREA */
+  .content { padding: 16px; position: relative; z-index: 1; }
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeUp 0.3s ease; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* GLASS CARD */
+  .glass {
+    background: linear-gradient(135deg, rgba(17,24,39,0.8), rgba(17,24,39,0.4));
+    border: 1px solid var(--border); border-radius: var(--radius);
+    backdrop-filter: blur(10px); padding: 16px; margin-bottom: 12px;
+    position: relative; overflow: hidden;
+  }
+  .glass::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
+  .glass-gold::after { content: ''; position: absolute; top: -50%; right: -50%; width: 100%; height: 100%; background: radial-gradient(circle, var(--gold-glow), transparent 70%); pointer-events: none; }
+  .glass-cyan::after { content: ''; position: absolute; top: -50%; right: -50%; width: 100%; height: 100%; background: radial-gradient(circle, var(--cyan-glow), transparent 70%); pointer-events: none; }
+  .glass-purple::after { content: ''; position: absolute; top: -50%; left: -50%; width: 100%; height: 100%; background: radial-gradient(circle, var(--purple-glow), transparent 70%); pointer-events: none; }
+
+  /* SECTION HEADERS */
+  .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .section-label .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); }
 
   /* KANBAN */
-  .kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  @media (max-width: 900px) { .kanban { grid-template-columns: 1fr 1fr; } }
-  @media (max-width: 600px) { .kanban { grid-template-columns: 1fr; } }
-  .kanban-col { background: #111118; border-radius: 12px; padding: 16px; min-height: 400px; }
-  .kanban-col h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; }
-  .kanban-col h3 .count { background: #222; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
-  .col-backlog h3 { color: #888; }
-  .col-todo h3 { color: #4dabf7; }
-  .col-progress h3 { color: #ffd43b; }
-  .col-done h3 { color: #51cf66; }
+  .kanban-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; }
+  .kanban-scroll::-webkit-scrollbar { height: 2px; }
+  .kanban-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .kanban-col { min-width: 280px; max-width: 300px; flex-shrink: 0; scroll-snap-align: start; }
+  .kanban-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+  .kanban-header .cnt { background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 500; }
+  .col-queue .kanban-header { color: var(--text-muted); }
+  .col-active .kanban-header { color: var(--cyan); }
+  .col-review .kanban-header { color: var(--orange); }
+  .col-done .kanban-header { color: var(--green); }
 
-  .card { background: #1a1a24; border-radius: 8px; padding: 14px; margin-bottom: 10px; border-left: 3px solid #333; cursor: default; transition: transform 0.1s; }
-  .card:hover { transform: translateX(2px); }
-  .card .card-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
-  .card .card-meta { font-size: 11px; color: #666; display: flex; justify-content: space-between; align-items: center; }
-  .card .card-agent { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
-  .agent-halo { background: #d4af3720; color: #d4af37; }
-  .agent-wraith { background: #9775fa20; color: #9775fa; }
-  .agent-oracle { background: #4dabf720; color: #4dabf7; }
-  .agent-prophet { background: #ff692220; color: #ff6922; }
-  .agent-forge { background: #20c99720; color: #20c997; }
-  .agent-vision { background: #ff6b6b20; color: #ff6b6b; }
-  .agent-herald { background: #da77f220; color: #da77f2; }
-  .agent-treasury { background: #69db7c20; color: #69db7c; }
-  .agent-nexus { background: #d4af3720; color: #d4af37; }
-
-  .priority-high { border-left-color: #ff4444; }
-  .priority-med { border-left-color: #ffd43b; }
-  .priority-low { border-left-color: #51cf66; }
-
-  /* CALENDAR */
-  .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-  .calendar-header h2 { color: #d4af37; }
-  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-  .cal-day-header { text-align: center; padding: 10px; color: #666; font-size: 12px; font-weight: 600; text-transform: uppercase; }
-  .cal-day { background: #111118; min-height: 100px; padding: 8px; border-radius: 4px; }
-  .cal-day.today { border: 1px solid #d4af37; }
-  .cal-day .day-num { font-size: 13px; color: #555; margin-bottom: 6px; }
-  .cal-day.today .day-num { color: #d4af37; font-weight: 700; }
-  .cal-event { font-size: 10px; padding: 3px 6px; border-radius: 3px; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .event-cron { background: #4dabf720; color: #4dabf7; }
-  .event-task { background: #ffd43b20; color: #ffd43b; }
-  .event-launch { background: #ff692220; color: #ff6922; }
-  .event-review { background: #9775fa20; color: #9775fa; }
-
-  /* PIPELINE */
-  .pipeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  @media (max-width: 700px) { .pipeline { grid-template-columns: 1fr; } }
-  .metric-card { background: #111118; border-radius: 12px; padding: 20px; text-align: center; }
-  .metric-value { font-size: 36px; font-weight: 700; color: #d4af37; }
-  .metric-label { font-size: 12px; color: #666; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
-
-  .opp-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-  .opp-table th { text-align: left; padding: 10px 12px; font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #222; }
-  .opp-table td { padding: 10px 12px; font-size: 13px; border-bottom: 1px solid #1a1a24; }
-  .score-badge { padding: 3px 10px; border-radius: 10px; font-size: 12px; font-weight: 700; }
-  .score-high { background: #00ff8820; color: #00ff88; }
-  .score-med { background: #ffd43b20; color: #ffd43b; }
-  .score-low { background: #ff444420; color: #ff4444; }
+  .task-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 12px; margin-bottom: 8px; cursor: default; transition: transform 0.15s, border-color 0.15s;
+  }
+  .task-card:active { transform: scale(0.98); }
+  .task-card.priority-high { border-left: 3px solid var(--red); }
+  .task-card.priority-med { border-left: 3px solid var(--orange); }
+  .task-card.priority-low { border-left: 3px solid var(--green); }
+  .task-card .title { font-size: 13px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; }
+  .task-card .meta { display: flex; justify-content: space-between; align-items: center; }
+  .task-card .agent-tag { font-size: 9px; padding: 3px 8px; border-radius: 999px; font-weight: 600; }
+  .tag-halo { background: rgba(212,175,55,0.15); color: var(--gold); }
+  .tag-wraith { background: rgba(168,85,247,0.15); color: var(--purple); }
+  .tag-oracle { background: rgba(0,229,255,0.15); color: var(--cyan); }
+  .tag-prophet { background: rgba(245,158,11,0.15); color: var(--orange); }
+  .tag-forge { background: rgba(16,185,129,0.15); color: var(--green); }
+  .tag-vision { background: rgba(239,68,68,0.15); color: var(--red); }
+  .tag-herald { background: rgba(168,85,247,0.15); color: #DA77F2; }
+  .tag-treasury { background: rgba(16,185,129,0.15); color: #69DB7C; }
+  .tag-nexus { background: rgba(212,175,55,0.15); color: var(--gold); }
+  .task-card .time { font-size: 10px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
 
   /* AGENTS */
-  .agents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-  .agent-card { background: #111118; border-radius: 12px; padding: 20px; border-top: 3px solid #333; }
-  .agent-card h3 { font-size: 16px; margin-bottom: 8px; }
-  .agent-card .role { font-size: 12px; color: #888; margin-bottom: 12px; }
-  .agent-card .task { font-size: 13px; color: #ccc; padding: 6px 0; border-top: 1px solid #1a1a24; }
-  .agent-halo-border { border-top-color: #d4af37; }
-  .agent-oracle-border { border-top-color: #4dabf7; }
-  .agent-wraith-border { border-top-color: #9775fa; }
-  .agent-vision-border { border-top-color: #ff6b6b; }
-  .agent-prophet-border { border-top-color: #ff6922; }
-  .agent-legis-border { border-top-color: #20c997; }
-  .agent-nexus-border { border-top-color: #d4af37; }
+  .agent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+  .agent-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 14px; position: relative; overflow: hidden; transition: border-color 0.2s;
+  }
+  .agent-card:active { border-color: rgba(255,255,255,0.1); }
+  .agent-card .agent-icon { font-size: 24px; margin-bottom: 6px; }
+  .agent-card .agent-name { font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+  .agent-card .agent-role { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  .agent-card .agent-status { margin-top: 8px; font-size: 10px; display: flex; align-items: center; gap: 4px; }
+  .agent-card .agent-status .dot { width: 5px; height: 5px; border-radius: 50%; }
 
-  .timestamp { color: #444; font-size: 11px; text-align: center; padding: 20px; }
+  /* PIPELINE TABLE */
+  .pipe-card { margin-bottom: 10px; }
+  .pipe-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 6px; }
+  .pipe-row:active { background: var(--card-hover); }
+  .pipe-info { flex: 1; }
+  .pipe-name { font-size: 13px; font-weight: 600; }
+  .pipe-cat { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  .pipe-score { text-align: right; }
+  .score-ring { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+  .ring-high { background: rgba(16,185,129,0.15); color: var(--green); border: 2px solid var(--green); }
+  .ring-med { background: rgba(245,158,11,0.15); color: var(--orange); border: 2px solid var(--orange); }
+  .pipe-value { font-size: 10px; color: var(--text-muted); margin-top: 4px; text-align: right; }
+
+  /* CALENDAR */
+  .cal-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 16px; }
+  .cal-day-hdr { text-align: center; font-size: 10px; color: var(--text-dim); font-weight: 600; padding: 6px 0; }
+  .cal-cell { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xs); min-height: 70px; padding: 6px; }
+  .cal-cell.today { border-color: var(--gold); box-shadow: 0 0 12px var(--gold-glow); }
+  .cal-num { font-size: 11px; font-weight: 600; color: var(--text-dim); margin-bottom: 4px; }
+  .cal-cell.today .cal-num { color: var(--gold); }
+  .cal-evt { font-size: 8px; padding: 2px 4px; border-radius: 3px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .evt-cron { background: rgba(0,229,255,0.1); color: var(--cyan); }
+  .evt-task { background: rgba(212,175,55,0.1); color: var(--gold); }
+  .evt-launch { background: rgba(239,68,68,0.1); color: var(--red); }
+  .evt-review { background: rgba(168,85,247,0.1); color: var(--purple); }
+
+  /* COMMS */
+  .msg-list { max-height: 60vh; overflow-y: auto; }
+  .msg-item { display: flex; gap: 10px; padding: 12px; border-bottom: 1px solid var(--border); }
+  .msg-item:active { background: var(--glass); }
+  .msg-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .msg-avatar.av-tg { background: rgba(0,229,255,0.15); }
+  .msg-avatar.av-dc { background: rgba(168,85,247,0.15); }
+  .msg-avatar.av-sys { background: rgba(212,175,55,0.15); }
+  .msg-body { flex: 1; min-width: 0; }
+  .msg-from { font-size: 12px; font-weight: 600; }
+  .msg-preview { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+  .msg-time { font-size: 9px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; margin-top: 4px; }
+
+  .compose-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+    background: rgba(6,8,15,0.95); backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border); padding: 10px 16px; display: none;
+  }
+  .compose-bar.show { display: flex; gap: 8px; align-items: center; }
+  .compose-input {
+    flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 999px;
+    padding: 10px 16px; color: var(--text); font-size: 14px; outline: none; font-family: 'Inter', sans-serif;
+  }
+  .compose-input:focus { border-color: var(--gold); }
+  .compose-send {
+    width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #FDE68A);
+    border: none; color: var(--bg); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .channel-pills { display: flex; gap: 6px; margin-bottom: 10px; overflow-x: auto; }
+  .channel-pill { padding: 6px 14px; border-radius: 999px; font-size: 11px; font-weight: 600; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; white-space: nowrap; }
+  .channel-pill.active { border-color: var(--gold); color: var(--gold); background: var(--gold-glow); }
+
+  /* VENTURES */
+  .venture-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; margin-bottom: 10px; position: relative; overflow: hidden;
+  }
+  .venture-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; }
+  .venture-card.v-alpha::before { background: linear-gradient(90deg, var(--gold), var(--orange)); }
+  .venture-card.v-high::before { background: linear-gradient(90deg, var(--cyan), var(--blue)); }
+  .venture-card.v-med::before { background: linear-gradient(90deg, var(--purple), var(--blue)); }
+  .venture-name { font-size: 15px; font-weight: 700; }
+  .venture-score { float: right; font-size: 24px; font-weight: 900; font-family: 'JetBrains Mono', monospace; }
+  .venture-desc { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  .venture-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .v-tag { font-size: 9px; padding: 3px 8px; border-radius: 999px; background: var(--glass); border: 1px solid var(--border); color: var(--text-muted); }
+
+  /* TRADING */
+  .trade-stat { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .trade-stat:last-child { border: none; }
+  .trade-label { font-size: 12px; color: var(--text-muted); }
+  .trade-val { font-size: 16px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+  .trade-val.positive { color: var(--green); }
+  .trade-val.negative { color: var(--red); }
+
+  /* FOOTER */
+  .footer { text-align: center; padding: 20px; font-size: 9px; color: var(--text-dim); letter-spacing: 1px; font-family: 'JetBrains Mono', monospace; }
+
+  /* MOBILE BOTTOM NAV */
+  .mobile-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 150;
+    background: rgba(6,8,15,0.95); backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border); display: flex; padding: 6px 0 env(safe-area-inset-bottom, 6px);
+  }
+  .mobile-nav-item {
+    flex: 1; text-align: center; padding: 8px 0; cursor: pointer; transition: color 0.2s;
+  }
+  .mobile-nav-item .nav-icon { font-size: 20px; }
+  .mobile-nav-item .nav-label { font-size: 9px; color: var(--text-dim); margin-top: 2px; font-weight: 600; letter-spacing: 0.5px; }
+  .mobile-nav-item.active .nav-label { color: var(--gold); }
+  .mobile-nav-item.active .nav-icon { filter: drop-shadow(0 0 6px var(--gold-glow)); }
+  
+  body { padding-bottom: 70px; }
+
+  /* RESPONSIVE */
+  @media (min-width: 768px) {
+    .kanban-scroll { flex-wrap: wrap; }
+    .kanban-col { min-width: 240px; flex: 1; }
+    .mobile-nav { display: none; }
+    body { padding-bottom: 20px; }
+    .agent-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (min-width: 1200px) {
+    .content { max-width: 1200px; margin: 0 auto; }
+    .kanban-col { min-width: 260px; }
+  }
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <div class="header">
-  <div>
-    <h1>👑 NTIC MISSION CONTROL</h1>
-    <div class="subtitle">ZJK Capital LLC · Godsense · The Throne Doesn't Sleep</div>
-  </div>
-  <div class="status">
-    <div><span class="status-dot green"></span> <span class="status-label">Webchat</span></div>
-    <div><span class="status-dot green"></span> <span class="status-label">Telegram</span></div>
-    <div><span class="status-dot green"></span> <span class="status-label">Discord</span></div>
-    <div><span class="status-dot green"></span> <span class="status-label">WRAITH</span></div>
+  <div class="header-top">
+    <div class="header-brand">
+      <span class="crown">👑</span>
+      <div>
+        <h1>NEXUS COMMAND</h1>
+        <div class="sub">ZJK CAPITAL · NTIC v11</div>
+      </div>
+    </div>
+    <div class="header-status">
+      <span class="status-pip pip-on"></span>
+      <span class="status-text" id="clock">--:--</span>
+    </div>
   </div>
 </div>
 
-<div class="tabs">
-  <div class="tab active" onclick="switchTab('kanban')">Kanban</div>
-  <div class="tab" onclick="switchTab('calendar')">Calendar</div>
-  <div class="tab" onclick="switchTab('pipeline')">Pipeline</div>
-  <div class="tab" onclick="switchTab('agents')">Agents</div>
+<!-- METRICS -->
+<div class="metrics-bar">
+  <div class="metric-mini"><div class="val">$0</div><div class="lbl">MRR</div></div>
+  <div class="metric-mini"><div class="val">5</div><div class="lbl">Pipeline</div></div>
+  <div class="metric-mini"><div class="val">3</div><div class="lbl">Approved</div></div>
+  <div class="metric-mini"><div class="val">31</div><div class="lbl">Files</div></div>
+</div>
+
+<!-- NAV -->
+<div class="nav-tabs" id="navTabs">
+  <div class="nav-tab active" data-panel="kanban">⬜ Board</div>
+  <div class="nav-tab" data-panel="pipeline">📊 Pipeline</div>
+  <div class="nav-tab" data-panel="agents">🤖 Agents</div>
+  <div class="nav-tab" data-panel="calendar">📅 Calendar</div>
+  <div class="nav-tab" data-panel="comms">💬 Comms</div>
+  <div class="nav-tab" data-panel="ventures">🏗️ Ventures</div>
+  <div class="nav-tab" data-panel="trading">📈 Trading</div>
 </div>
 
 <!-- KANBAN -->
-<div id="kanban" class="content active">
-  <div class="kanban">
-    <div class="kanban-col col-backlog">
-      <h3>BACKLOG <span class="count">4</span></h3>
-      <div class="card priority-med">
-        <div class="card-title">Set up Twilio for AI Receptionist</div>
-        <div class="card-meta"><span class="card-agent agent-forge">FORGE</span> Blocked</div>
-      </div>
-      <div class="card priority-low">
-        <div class="card-title">AI Workforce Builder Module 2-6</div>
-        <div class="card-meta"><span class="card-agent agent-prophet">PROPHET</span> Queued</div>
-      </div>
-      <div class="card priority-low">
-        <div class="card-title">WealthThrone v2 Launch Sequence</div>
-        <div class="card-meta"><span class="card-agent agent-nexus">NEXUS</span> Planned</div>
-      </div>
-      <div class="card priority-low">
-        <div class="card-title">Clip Army YouTube OAuth Tokens</div>
-        <div class="card-meta"><span class="card-agent agent-vision">VISION</span> Blocked</div>
-      </div>
+<div class="content">
+<div id="kanban" class="panel active">
+  <div class="kanban-scroll">
+    <div class="kanban-col col-queue">
+      <div class="kanban-header">Queue <span class="cnt">4</span></div>
+      <div class="task-card priority-med"><div class="title">Set up Twilio for AI Receptionist</div><div class="meta"><span class="agent-tag tag-forge">FORGE</span><span class="time">Blocked</span></div></div>
+      <div class="task-card priority-low"><div class="title">AI Workforce Builder Modules 2-6</div><div class="meta"><span class="agent-tag tag-prophet">PROPHET</span><span class="time">Queued</span></div></div>
+      <div class="task-card priority-low"><div class="title">WealthThrone v2 Launch</div><div class="meta"><span class="agent-tag tag-nexus">NEXUS</span><span class="time">Planned</span></div></div>
+      <div class="task-card priority-low"><div class="title">Clip Army OAuth Tokens</div><div class="meta"><span class="agent-tag tag-vision">VISION</span><span class="time">Blocked</span></div></div>
     </div>
-
-    <div class="kanban-col col-todo">
-      <h3 style="color:#4dabf7">TO DO <span class="count">5</span></h3>
-      <div class="card priority-high">
-        <div class="card-title">Post LinkedIn Architecture Thread</div>
-        <div class="card-meta"><span class="card-agent agent-herald">HERALD</span> Ready</div>
-      </div>
-      <div class="card priority-high">
-        <div class="card-title">AI Workforce Builder Module 1 Video</div>
-        <div class="card-meta"><span class="card-agent agent-prophet">PROPHET</span> ElevenLabs Ready</div>
-      </div>
-      <div class="card priority-high">
-        <div class="card-title">First WRAITH Recon Sweep (50 targets)</div>
-        <div class="card-meta"><span class="card-agent agent-wraith">WRAITH</span> Brave API Live</div>
-      </div>
-      <div class="card priority-med">
-        <div class="card-title">Discord DM Pairing</div>
-        <div class="card-meta"><span class="card-agent agent-vision">VISION</span> Operator Action</div>
-      </div>
-      <div class="card priority-med">
-        <div class="card-title">DP6 Landing Page</div>
-        <div class="card-meta"><span class="card-agent agent-forge">FORGE</span> Ready</div>
-      </div>
+    <div class="kanban-col col-active">
+      <div class="kanban-header" style="color:var(--cyan)">Active <span class="cnt">4</span></div>
+      <div class="task-card priority-high"><div class="title">Sniper Engine MES Build</div><div class="meta"><span class="agent-tag tag-oracle">ORACLE</span><span class="time">Building</span></div></div>
+      <div class="task-card priority-high"><div class="title">FutureMind Kids App</div><div class="meta"><span class="agent-tag tag-forge">FORGE</span><span class="time">Building</span></div></div>
+      <div class="task-card priority-high"><div class="title">WRAITH Digital Recon</div><div class="meta"><span class="agent-tag tag-wraith">WRAITH</span><span class="time">Scanning</span></div></div>
+      <div class="task-card priority-med"><div class="title">Mission Control v2</div><div class="meta"><span class="agent-tag tag-nexus">NEXUS</span><span class="time">Active</span></div></div>
     </div>
-
-    <div class="kanban-col col-progress">
-      <h3 style="color:#ffd43b">IN PROGRESS <span class="count">2</span></h3>
-      <div class="card priority-high">
-        <div class="card-title">WRAITH Market Scanning (Brave API)</div>
-        <div class="card-meta"><span class="card-agent agent-wraith">WRAITH</span> Active</div>
-      </div>
-      <div class="card priority-high">
-        <div class="card-title">Autonomous Operations Loop</div>
-        <div class="card-meta"><span class="card-agent agent-halo">HALO</span> Running</div>
-      </div>
+    <div class="kanban-col col-review">
+      <div class="kanban-header" style="color:var(--orange)">Review <span class="cnt">2</span></div>
+      <div class="task-card priority-med"><div class="title">Voice Content Service</div><div class="meta"><span class="agent-tag tag-prophet">PROPHET</span><span class="time">Score: 78</span></div></div>
+      <div class="task-card priority-med"><div class="title">Local Business AI Front Desk</div><div class="meta"><span class="agent-tag tag-herald">HERALD</span><span class="time">Score: 76</span></div></div>
     </div>
-
     <div class="kanban-col col-done">
-      <h3 style="color:#51cf66">DONE <span class="count">12</span></h3>
-      <div class="card priority-high" style="border-left-color:#51cf66">
-        <div class="card-title">✅ Blueprint v11 (1,031 lines)</div>
-        <div class="card-meta"><span class="card-agent agent-nexus">NEXUS</span> Complete</div>
-      </div>
-      <div class="card priority-high" style="border-left-color:#51cf66">
-        <div class="card-title">✅ Telegram Connected</div>
-        <div class="card-meta"><span class="card-agent agent-vision">VISION</span> Live</div>
-      </div>
-      <div class="card priority-high" style="border-left-color:#51cf66">
-        <div class="card-title">✅ Discord Connected</div>
-        <div class="card-meta"><span class="card-agent agent-vision">VISION</span> Live</div>
-      </div>
-      <div class="card priority-high" style="border-left-color:#51cf66">
-        <div class="card-title">✅ Brave Search API Configured</div>
-        <div class="card-meta"><span class="card-agent agent-wraith">WRAITH</span> Live</div>
-      </div>
-      <div class="card" style="border-left-color:#51cf66">
-        <div class="card-title">✅ AI Consulting Offer Written</div>
-        <div class="card-meta"><span class="card-agent agent-forge">FORGE</span> Complete</div>
-      </div>
-      <div class="card" style="border-left-color:#51cf66">
-        <div class="card-title">✅ NTIC Case Study Written</div>
-        <div class="card-meta"><span class="card-agent agent-forge">FORGE</span> Complete</div>
-      </div>
-      <div class="card" style="border-left-color:#51cf66">
-        <div class="card-title">✅ DP6 Sample Digest Created</div>
-        <div class="card-meta"><span class="card-agent agent-prophet">PROPHET</span> Complete</div>
-      </div>
-      <div class="card" style="border-left-color:#51cf66">
-        <div class="card-title">✅ Outreach Posts (4) Ready</div>
-        <div class="card-meta"><span class="card-agent agent-herald">HERALD</span> Complete</div>
-      </div>
-      <div class="card" style="border-left-color:#51cf66">
-        <div class="card-title">✅ Lead Scoring Template</div>
-        <div class="card-meta"><span class="card-agent agent-oracle">ORACLE</span> Complete</div>
-      </div>
-      <div class="card" style="border-left-color:#51cf66">
-        <div class="card-title">✅ 7 Agent Soul Files</div>
-        <div class="card-meta"><span class="card-agent agent-nexus">NEXUS</span> Complete</div>
-      </div>
-      <div class="card" style="border-left-color:#51cf66">
-        <div class="card-title">✅ MRR Tracker</div>
-        <div class="card-meta"><span class="card-agent agent-treasury">TREASURY</span> Complete</div>
-      </div>
-      <div class="card" style="border-left-color:#51cf66">
-        <div class="card-title">✅ Memory Backup (MEMORY.md)</div>
-        <div class="card-meta"><span class="card-agent agent-nexus">NEXUS</span> Complete</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- CALENDAR -->
-<div id="calendar" class="content">
-  <div class="calendar-header">
-    <h2>March 2026</h2>
-    <div style="color:#888; font-size:13px;">Week of March 17-23</div>
-  </div>
-  <div class="cal-grid">
-    <div class="cal-day-header">Mon</div>
-    <div class="cal-day-header">Tue</div>
-    <div class="cal-day-header">Wed</div>
-    <div class="cal-day-header">Thu</div>
-    <div class="cal-day-header">Fri</div>
-    <div class="cal-day-header">Sat</div>
-    <div class="cal-day-header">Sun</div>
-
-    <div class="cal-day"><div class="day-num">17</div>
-      <div class="cal-event event-cron">07:00 ORACLE Brief</div>
-      <div class="cal-event event-cron">07:30 HALO Brief</div>
-    </div>
-    <div class="cal-day"><div class="day-num">18</div>
-      <div class="cal-event event-cron">07:00 ORACLE Brief</div>
-      <div class="cal-event event-cron">07:30 HALO Brief</div>
-    </div>
-    <div class="cal-day today"><div class="day-num">19 — TODAY</div>
-      <div class="cal-event event-launch">🚀 NTIC System Online</div>
-      <div class="cal-event event-task">Autonomous Mode Activated</div>
-      <div class="cal-event event-task">Post LinkedIn Thread</div>
-      <div class="cal-event event-cron">02:00 VISION Audit</div>
-      <div class="cal-event event-cron">07:00 ORACLE Brief</div>
-      <div class="cal-event event-cron">07:30 HALO Brief</div>
-    </div>
-    <div class="cal-day"><div class="day-num">20</div>
-      <div class="cal-event event-task">Twitter/X Thread Launch</div>
-      <div class="cal-event event-task">WRAITH: 50 Target Recon</div>
-      <div class="cal-event event-cron">07:00 ORACLE Brief</div>
-      <div class="cal-event event-cron">07:30 HALO Brief</div>
-    </div>
-    <div class="cal-day"><div class="day-num">21</div>
-      <div class="cal-event event-task">LinkedIn Pain Post</div>
-      <div class="cal-event event-task">AI Course Module 1</div>
-      <div class="cal-event event-cron">07:00 ORACLE Brief</div>
-      <div class="cal-event event-cron">07:30 HALO Brief</div>
-    </div>
-    <div class="cal-day"><div class="day-num">22</div>
-      <div class="cal-event event-task">DP6 Launch Post</div>
-      <div class="cal-event event-task">Score First 50 Leads</div>
-    </div>
-    <div class="cal-day"><div class="day-num">23</div>
-      <div class="cal-event event-review">📋 Weekly Review</div>
-      <div class="cal-event event-review">TREASURY Report</div>
-    </div>
-
-    <div class="cal-day"><div class="day-num">24</div>
-      <div class="cal-event event-task">Outreach Campaign #1</div>
-      <div class="cal-event event-cron">07:30 HALO Brief</div>
-    </div>
-    <div class="cal-day"><div class="day-num">25</div>
-      <div class="cal-event event-task">Follow-Up Sequence</div>
-      <div class="cal-event event-launch">🎯 First Demo Target</div>
-    </div>
-    <div class="cal-day"><div class="day-num">26</div>
-      <div class="cal-event event-task">DP6 Issue #1 Publish</div>
-    </div>
-    <div class="cal-day"><div class="day-num">27</div>
-      <div class="cal-event event-task">AI Course Module 2</div>
-    </div>
-    <div class="cal-day"><div class="day-num">28</div>
-      <div class="cal-event event-launch">🎯 First Client Close</div>
-    </div>
-    <div class="cal-day"><div class="day-num">29</div></div>
-    <div class="cal-day"><div class="day-num">30</div>
-      <div class="cal-event event-review">📋 Monthly Review</div>
-      <div class="cal-event event-review">MRR Checkpoint</div>
+      <div class="kanban-header" style="color:var(--green)">Done <span class="cnt">12</span></div>
+      <div class="task-card" style="border-left:3px solid var(--green)"><div class="title">✓ Blueprint v11</div><div class="meta"><span class="agent-tag tag-nexus">NEXUS</span><span class="time">1,031 lines</span></div></div>
+      <div class="task-card" style="border-left:3px solid var(--green)"><div class="title">✓ Telegram + Discord Live</div><div class="meta"><span class="agent-tag tag-vision">VISION</span><span class="time">Connected</span></div></div>
+      <div class="task-card" style="border-left:3px solid var(--green)"><div class="title">✓ Brave Search Configured</div><div class="meta"><span class="agent-tag tag-wraith">WRAITH</span><span class="time">Hunting</span></div></div>
+      <div class="task-card" style="border-left:3px solid var(--green)"><div class="title">✓ AI Consulting Offer</div><div class="meta"><span class="agent-tag tag-forge">FORGE</span><span class="time">Ready</span></div></div>
+      <div class="task-card" style="border-left:3px solid var(--green)"><div class="title">✓ DP6 Sample Digest</div><div class="meta"><span class="agent-tag tag-prophet">PROPHET</span><span class="time">Ready</span></div></div>
+      <div class="task-card" style="border-left:3px solid var(--green)"><div class="title">✓ Case Study + Outreach</div><div class="meta"><span class="agent-tag tag-herald">HERALD</span><span class="time">4 posts</span></div></div>
+      <div class="task-card" style="border-left:3px solid var(--green)"><div class="title">✓ TopstepX Authenticated</div><div class="meta"><span class="agent-tag tag-oracle">ORACLE</span><span class="time">Live</span></div></div>
+      <div class="task-card" style="border-left:3px solid var(--green)"><div class="title">✓ FutureMind Blueprint</div><div class="meta"><span class="agent-tag tag-nexus">NEXUS</span><span class="time">448 lines</span></div></div>
     </div>
   </div>
 </div>
 
 <!-- PIPELINE -->
-<div id="pipeline" class="content">
-  <div class="pipeline">
-    <div class="metric-card">
-      <div class="metric-value">$0</div>
-      <div class="metric-label">Current MRR</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-value">5</div>
-      <div class="metric-label">Opportunities Scored</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-value">3</div>
-      <div class="metric-label">Auto-Approved</div>
-    </div>
-  </div>
-  <div class="pipeline">
-    <div class="metric-card">
-      <div class="metric-value">$14.5K</div>
-      <div class="metric-label">Pipeline Potential (Monthly)</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-value">10</div>
-      <div class="metric-label">Verticals Active</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-value">31</div>
-      <div class="metric-label">System Files Built</div>
-    </div>
-  </div>
-
-  <h3 style="color:#d4af37; margin: 20px 0 10px;">Live Opportunity Queue</h3>
-  <table class="opp-table">
-    <thead>
-      <tr><th>Opportunity</th><th>Category</th><th>Score</th><th>Monthly Value</th><th>Status</th></tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>AI System Consulting</td><td>AI Automation</td>
-        <td><span class="score-badge score-high">92</span></td>
-        <td>$5-15K</td><td>✅ Assets Built</td>
-      </tr>
-      <tr>
-        <td>AI Workforce Course</td><td>Content/Creator</td>
-        <td><span class="score-badge score-high">89</span></td>
-        <td>$2.5-5K</td><td>⚡ Production Next</td>
-      </tr>
-      <tr>
-        <td>DP6 Membership</td><td>Intelligence</td>
-        <td><span class="score-badge score-high">88</span></td>
-        <td>$3-9K</td><td>✅ Sample Built</td>
-      </tr>
-      <tr>
-        <td>Voice Content Service</td><td>Content/Creator</td>
-        <td><span class="score-badge score-med">78</span></td>
-        <td>$1-3K</td><td>🟡 Review</td>
-      </tr>
-      <tr>
-        <td>Local Business AI</td><td>Local Services</td>
-        <td><span class="score-badge score-med">76</span></td>
-        <td>$3-10K</td><td>🟡 Blocked</td>
-      </tr>
-    </tbody>
-  </table>
+<div id="pipeline" class="panel">
+  <div class="section-label"><span class="dot"></span> AUTO-APPROVED (85+)</div>
+  <div class="pipe-row"><div class="pipe-info"><div class="pipe-name">AI System Consulting</div><div class="pipe-cat">AI Automation · Assets Built</div></div><div class="pipe-score"><div class="score-ring ring-high">92</div><div class="pipe-value">$5-15K/mo</div></div></div>
+  <div class="pipe-row"><div class="pipe-info"><div class="pipe-name">AI Workforce Course</div><div class="pipe-cat">Content/Creator · Production Next</div></div><div class="pipe-score"><div class="score-ring ring-high">89</div><div class="pipe-value">$2.5-5K/mo</div></div></div>
+  <div class="pipe-row"><div class="pipe-info"><div class="pipe-name">DP6 Intelligence Membership</div><div class="pipe-cat">Intelligence · Sample Built</div></div><div class="pipe-score"><div class="score-ring ring-high">88</div><div class="pipe-value">$3-9K/mo</div></div></div>
+  <div class="section-label" style="margin-top:20px"><span class="dot" style="background:var(--orange)"></span> OPERATOR REVIEW (70-84)</div>
+  <div class="pipe-row"><div class="pipe-info"><div class="pipe-name">Voice Content Service</div><div class="pipe-cat">Content/Creator · ElevenLabs Ready</div></div><div class="pipe-score"><div class="score-ring ring-med">78</div><div class="pipe-value">$1-3K/mo</div></div></div>
+  <div class="pipe-row"><div class="pipe-info"><div class="pipe-name">Local Business AI Front Desk</div><div class="pipe-cat">Local Services · Needs Twilio</div></div><div class="pipe-score"><div class="score-ring ring-med">76</div><div class="pipe-value">$3-10K/mo</div></div></div>
 </div>
 
 <!-- AGENTS -->
-<div id="agents" class="content">
-  <div class="agents-grid">
-    <div class="agent-card agent-halo-border">
-      <h3>👑 HALO — Command Hub</h3>
-      <div class="role">Orchestrator · Morning Brief · Task Routing</div>
-      <div class="task">✅ Autonomous loop running</div>
-      <div class="task">✅ Mission brief #001 generated</div>
-      <div class="task">⏳ Next: 07:30 morning brief</div>
-    </div>
-    <div class="agent-card agent-oracle-border">
-      <h3>🔮 ORACLE — Decision Engine</h3>
-      <div class="role">Lead Scoring · Stock Research · Opportunity Ranking</div>
-      <div class="task">✅ 5 opportunities scored</div>
-      <div class="task">✅ JB3 scoring template built</div>
-      <div class="task">⏳ Next: Score WRAITH recon results</div>
-    </div>
-    <div class="agent-card agent-wraith-border">
-      <h3>👻 WRAITH — Recon Hunter</h3>
-      <div class="role">4-Track Scanning · Lead Discovery · OPA Mapping</div>
-      <div class="task">✅ Brave Search API live</div>
-      <div class="task">🔥 First live recon: HVAC Charlotte</div>
-      <div class="task">⏳ Next: Full 50-target sweep</div>
-    </div>
-    <div class="agent-card agent-vision-border">
-      <h3>👁️ VISION — System Guardian</h3>
-      <div class="role">Health Monitoring · Security · Drift Detection</div>
-      <div class="task">✅ All channels operational</div>
-      <div class="task">✅ Drift log maintained</div>
-      <div class="task">🟢 System healthy — silence mode</div>
-    </div>
-    <div class="agent-card agent-prophet-border">
-      <h3>⚡ PROPHET — Content & Prediction</h3>
-      <div class="role">Content Pipeline · Revenue Forecasting · Lead Loop</div>
-      <div class="task">✅ DP6 sample digest built</div>
-      <div class="task">✅ Outreach posts ready</div>
-      <div class="task">⏳ Next: AI Course Module 1 video</div>
-    </div>
-    <div class="agent-card agent-legis-border">
-      <h3>⚖️ LEGIS — Compliance</h3>
-      <div class="role">Legal Docs · Contracts · SOP Governance</div>
-      <div class="task">⏳ Pending: Soul file on Railway</div>
-      <div class="task">⏳ Activates on venture launch</div>
-    </div>
-    <div class="agent-card agent-nexus-border">
-      <h3>🏛️ NEXUS — Strategic Command</h3>
-      <div class="role">Supreme Orchestration · ZJK Brand Voice</div>
-      <div class="task">✅ Blueprint v11 governing</div>
-      <div class="task">✅ Memory backup complete</div>
-      <div class="task">✅ Autonomous mode active</div>
-    </div>
+<div id="agents" class="panel">
+  <div class="agent-grid">
+    <div class="agent-card"><div class="agent-icon">👑</div><div class="agent-name">HALO</div><div class="agent-role">Command Hub</div><div class="agent-status"><span class="dot" style="background:var(--green)"></span> Autonomous</div></div>
+    <div class="agent-card"><div class="agent-icon">🔮</div><div class="agent-name">ORACLE</div><div class="agent-role">Decision Intel</div><div class="agent-status"><span class="dot" style="background:var(--green)"></span> 5 Scored</div></div>
+    <div class="agent-card"><div class="agent-icon">👻</div><div class="agent-name">WRAITH</div><div class="agent-role">Recon Hunter</div><div class="agent-status"><span class="dot" style="background:var(--green)"></span> Hunting</div></div>
+    <div class="agent-card"><div class="agent-icon">👁️</div><div class="agent-name">VISION</div><div class="agent-role">System Guard</div><div class="agent-status"><span class="dot" style="background:var(--green)"></span> Clean</div></div>
+    <div class="agent-card"><div class="agent-icon">⚡</div><div class="agent-name">PROPHET</div><div class="agent-role">Content + Predict</div><div class="agent-status"><span class="dot" style="background:var(--cyan)"></span> Building</div></div>
+    <div class="agent-card"><div class="agent-icon">⚖️</div><div class="agent-name">LEGIS</div><div class="agent-role">Compliance</div><div class="agent-status"><span class="dot" style="background:var(--text-dim)"></span> Standby</div></div>
+    <div class="agent-card"><div class="agent-icon">🏛️</div><div class="agent-name">NEXUS</div><div class="agent-role">Strategic Cmd</div><div class="agent-status"><span class="dot" style="background:var(--green)"></span> Active</div></div>
   </div>
 </div>
 
-<div class="timestamp">
-  NTIC Mission Control · Last updated: <span id="timestamp"></span> · Blueprint v11 · 1,031 lines
+<!-- CALENDAR -->
+<div id="calendar" class="panel">
+  <div class="glass glass-gold" style="margin-bottom:16px">
+    <div style="font-size:18px;font-weight:700;">March 2026</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Week of March 17-23</div>
+  </div>
+  <div class="cal-week">
+    <div class="cal-day-hdr">M</div><div class="cal-day-hdr">T</div><div class="cal-day-hdr">W</div><div class="cal-day-hdr">T</div><div class="cal-day-hdr">F</div><div class="cal-day-hdr">S</div><div class="cal-day-hdr">S</div>
+    <div class="cal-cell"><div class="cal-num">17</div><div class="cal-evt evt-cron">ORACLE 7a</div></div>
+    <div class="cal-cell"><div class="cal-num">18</div><div class="cal-evt evt-cron">HALO 7:30a</div></div>
+    <div class="cal-cell today"><div class="cal-num">19</div><div class="cal-evt evt-launch">🚀 NTIC LIVE</div><div class="cal-evt evt-task">Sniper Build</div><div class="cal-evt evt-task">FutureMind</div></div>
+    <div class="cal-cell"><div class="cal-num">20</div><div class="cal-evt evt-task">LinkedIn Post</div><div class="cal-evt evt-task">50 Targets</div></div>
+    <div class="cal-cell"><div class="cal-num">21</div><div class="cal-evt evt-task">Module 1</div></div>
+    <div class="cal-cell"><div class="cal-num">22</div><div class="cal-evt evt-task">DP6 Launch</div></div>
+    <div class="cal-cell"><div class="cal-num">23</div><div class="cal-evt evt-review">Weekly Review</div></div>
+  </div>
+  <div class="cal-week">
+    <div class="cal-cell"><div class="cal-num">24</div><div class="cal-evt evt-task">Outreach #1</div></div>
+    <div class="cal-cell"><div class="cal-num">25</div><div class="cal-evt evt-launch">First Demo</div></div>
+    <div class="cal-cell"><div class="cal-num">26</div><div class="cal-evt evt-task">DP6 Issue 1</div></div>
+    <div class="cal-cell"><div class="cal-num">27</div><div class="cal-evt evt-task">Module 2</div></div>
+    <div class="cal-cell"><div class="cal-num">28</div><div class="cal-evt evt-launch">First Close</div></div>
+    <div class="cal-cell"><div class="cal-num">29</div></div>
+    <div class="cal-cell"><div class="cal-num">30</div><div class="cal-evt evt-review">Month Review</div></div>
+  </div>
+</div>
+
+<!-- COMMS -->
+<div id="comms" class="panel">
+  <div class="channel-pills">
+    <div class="channel-pill active">All</div>
+    <div class="channel-pill">📱 Telegram</div>
+    <div class="channel-pill">💬 Discord</div>
+    <div class="channel-pill">🤖 System</div>
+  </div>
+  <div class="msg-list">
+    <div class="msg-item"><div class="msg-avatar av-sys">👑</div><div class="msg-body"><div class="msg-from">NEXUS</div><div class="msg-preview">NTIC System fully operational. All channels connected.</div><div class="msg-time">04:04 ET</div></div></div>
+    <div class="msg-item"><div class="msg-avatar av-tg">📱</div><div class="msg-body"><div class="msg-from">Telegram · James</div><div class="msg-preview">build it add whatever else you think is needed</div><div class="msg-time">04:04 ET</div></div></div>
+    <div class="msg-item"><div class="msg-avatar av-sys">🔮</div><div class="msg-body"><div class="msg-from">ORACLE</div><div class="msg-preview">TopstepX authenticated. 4 tradeable accounts found.</div><div class="msg-time">03:28 ET</div></div></div>
+    <div class="msg-item"><div class="msg-avatar av-sys">👻</div><div class="msg-body"><div class="msg-from">WRAITH</div><div class="msg-preview">Brave Search live. First recon: HVAC Charlotte — 5 targets.</div><div class="msg-time">02:49 ET</div></div></div>
+    <div class="msg-item"><div class="msg-avatar av-dc">💬</div><div class="msg-body"><div class="msg-from">Discord · #mission-control</div><div class="msg-preview">NTIC SYSTEM ONLINE. All channels operational.</div><div class="msg-time">02:48 ET</div></div></div>
+    <div class="msg-item"><div class="msg-avatar av-sys">⚡</div><div class="msg-body"><div class="msg-from">PROPHET</div><div class="msg-preview">DP6 Sample Digest built. LinkedIn posts ready to deploy.</div><div class="msg-time">02:42 ET</div></div></div>
+    <div class="msg-item"><div class="msg-avatar av-tg">📱</div><div class="msg-body"><div class="msg-from">Telegram · James</div><div class="msg-preview">so were up and running</div><div class="msg-time">02:49 ET</div></div></div>
+    <div class="msg-item"><div class="msg-avatar av-sys">👁️</div><div class="msg-body"><div class="msg-from">VISION</div><div class="msg-preview">Discord gateway fixed. All 3 channels green.</div><div class="msg-time">02:33 ET</div></div></div>
+  </div>
+</div>
+
+<!-- VENTURES -->
+<div id="ventures" class="panel">
+  <div class="venture-card v-alpha"><div class="venture-score" style="color:var(--gold)">94</div><div class="venture-name">WealthThrone</div><div class="venture-desc">Community Wealth Intelligence Platform — CATEGORY ALPHA</div><div class="venture-tags"><div class="v-tag">Platform</div><div class="v-tag">All Agents</div><div class="v-tag">GHL Killer</div></div></div>
+  <div class="venture-card v-high"><div class="venture-score" style="color:var(--cyan)">91</div><div class="venture-name">DP6</div><div class="venture-desc">$297/month intelligence membership — monetize what NTIC already produces</div><div class="venture-tags"><div class="v-tag">Subscription</div><div class="v-tag">Content</div><div class="v-tag">Ready</div></div></div>
+  <div class="venture-card v-high"><div class="venture-score" style="color:var(--cyan)">89</div><div class="venture-name">FutureMind Kids</div><div class="venture-desc">AI-powered digital school ecosystem — the greatest kids app ever built</div><div class="venture-tags"><div class="v-tag">EdTech</div><div class="v-tag">Building</div><div class="v-tag">Global Mission</div></div></div>
+  <div class="venture-card v-med"><div class="venture-score" style="color:var(--purple)">87</div><div class="venture-name">AgentMarket</div><div class="venture-desc">AI Workforce Marketplace — 15% commission + $297/month operator listing</div><div class="venture-tags"><div class="v-tag">Marketplace</div><div class="v-tag">Queued</div></div></div>
+  <div class="venture-card v-med"><div class="venture-score" style="color:var(--purple)">86</div><div class="venture-name">CarolinaSignal</div><div class="venture-desc">Eastern NC Intelligence Network — cultural context Silicon Valley can't buy</div><div class="venture-tags"><div class="v-tag">Local Intel</div><div class="v-tag">$97-497/mo</div></div></div>
+</div>
+
+<!-- TRADING -->
+<div id="trading" class="panel">
+  <div class="glass glass-cyan">
+    <div style="font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:1px;margin-bottom:12px;">SNIPER ENGINE · MES</div>
+    <div class="trade-stat"><span class="trade-label">Status</span><span class="trade-val" style="color:var(--orange)">BUILDING</span></div>
+    <div class="trade-stat"><span class="trade-label">Mode</span><span class="trade-val" style="color:var(--text)">SIGNAL ONLY</span></div>
+    <div class="trade-stat"><span class="trade-label">Daily Target</span><span class="trade-val">$500</span></div>
+    <div class="trade-stat"><span class="trade-label">Max Contracts</span><span class="trade-val">2 MES</span></div>
+    <div class="trade-stat"><span class="trade-label">Daily Loss Limit</span><span class="trade-val negative">-$250</span></div>
+  </div>
+  <div class="section-label" style="margin-top:16px"><span class="dot" style="background:var(--cyan)"></span> ACCOUNTS</div>
+  <div class="glass">
+    <div class="trade-stat"><span class="trade-label">Funded (Express)</span><span class="trade-val positive">$285.05</span></div>
+    <div class="trade-stat"><span class="trade-label">New Combine (50K)</span><span class="trade-val positive">$50,000.00</span></div>
+    <div class="trade-stat"><span class="trade-label">Practice</span><span class="trade-val">$162,173.77</span></div>
+  </div>
+  <div class="section-label"><span class="dot" style="background:var(--cyan)"></span> NEXT SESSION</div>
+  <div class="glass">
+    <div class="trade-stat"><span class="trade-label">Pre-Market Bias</span><span class="trade-val" style="color:var(--text-muted)">07:00 ET</span></div>
+    <div class="trade-stat"><span class="trade-label">NY Open Kill Zone</span><span class="trade-val" style="color:var(--cyan)">09:30 - 11:00 ET</span></div>
+    <div class="trade-stat"><span class="trade-label">NY PM Session</span><span class="trade-val" style="color:var(--cyan)">13:30 - 15:30 ET</span></div>
+  </div>
+</div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="mobile-nav" id="mobileNav">
+  <div class="mobile-nav-item active" data-panel="kanban"><div class="nav-icon">⬜</div><div class="nav-label">Board</div></div>
+  <div class="mobile-nav-item" data-panel="pipeline"><div class="nav-icon">📊</div><div class="nav-label">Pipeline</div></div>
+  <div class="mobile-nav-item" data-panel="comms"><div class="nav-icon">💬</div><div class="nav-label">Comms</div></div>
+  <div class="mobile-nav-item" data-panel="ventures"><div class="nav-icon">🏗️</div><div class="nav-label">Ventures</div></div>
+  <div class="mobile-nav-item" data-panel="trading"><div class="nav-icon">📈</div><div class="nav-label">Trading</div></div>
+</div>
+
+<div class="footer">
+  NEXUS COMMAND CENTER · NTIC v11 · <span id="footerTime"></span><br>
+  THE THRONE IS SOVEREIGN · THE FLYWHEEL SPINS · THE THRONE DOESN'T SLEEP
 </div>
 
 <script>
-function switchTab(tabName) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
-  document.getElementById(tabName).classList.add('active');
-  document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+// Tab switching
+function switchPanel(panel) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab, .mobile-nav-item').forEach(t => t.classList.remove('active'));
+  document.getElementById(panel)?.classList.add('active');
+  document.querySelectorAll(`[data-panel="${panel}"]`).forEach(t => t.classList.add('active'));
 }
+document.querySelectorAll('.nav-tab, .mobile-nav-item').forEach(tab => {
+  tab.addEventListener('click', () => switchPanel(tab.dataset.panel));
+});
 
-document.getElementById('timestamp').textContent = new Date().toLocaleString('en-US', {
-  timeZone: 'America/New_York',
-  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-  hour: '2-digit', minute: '2-digit', second: '2-digit'
+// Clock
+function updateClock() {
+  const now = new Date().toLocaleString('en-US', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+  document.getElementById('clock').textContent = now + ' ET';
+  const full = new Date().toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  document.getElementById('footerTime').textContent = full;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// Channel filter
+document.querySelectorAll('.channel-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.channel-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+  });
 });
 </script>
-
 </body>
 </html>
